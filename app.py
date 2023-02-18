@@ -29,11 +29,12 @@ def ycadd_completed():
     origin_port=request.values['origin_port']
     type_=request.values['type']
     redirect=request.values['redirect'] or None
-    
+    cusID=request.values['customer_ID']
+
     domainlist=[ x for x in domain.split(',')]
 
 
-    t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(domainlist,request_port,origin_addr,origin_port,type_,redirect))
+    t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()
     
     # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)

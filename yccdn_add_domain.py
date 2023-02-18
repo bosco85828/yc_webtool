@@ -29,7 +29,7 @@ options.add_argument('--disable-dev-shm-usage')
 # options.add_argument("--headless") 
 
 
-def login():
+def login(admin):
 
     s=Service(ChromeDriverManager().install())
     global browser
@@ -65,7 +65,7 @@ def login():
     # temp=browser.find_element(By.XPATH,'//input[@id="Name"][1]')
     locator=(By.XPATH,'//input[@id="Name"][1]')
     temp=wait.until(EC.presence_of_element_located(locator))
-    temp.send_keys('yc')
+    temp.send_keys(admin)
 
     # temp=browser.find_element(By.XPATH,'//button[@class="btn btn-default"][1]')
     locator=(By.XPATH,'//button[@class="btn btn-default"][1]')
@@ -88,8 +88,8 @@ def login():
 
     
 
-def add_domain(domainlist,request_port,origin_addr,origin_port,type,redirect=None):
-    login()
+def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redirect=None):
+    login(cusID)
     for domain in domainlist:
         try:
             locator=(By.XPATH,'//i[@class="fa fa-plus-circle"]')
