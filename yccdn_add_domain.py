@@ -88,58 +88,70 @@ def login():
 
     
 
-def add_domain(domain,request_port,origin_addr,origin_port,type,redirect=False,redirect_type=None):
-    try:
-        locator=(By.XPATH,'//i[@class="fa fa-plus-circle"]')
-        temp=wait.until(EC.element_to_be_clickable(locator))
-        temp.click()
-        locator=(By.XPATH,'//input[@id="Domain"]')
-        d_name=wait.until(EC.presence_of_element_located(locator))
-        d_name.send_keys(domain)
-        locator=(By.XPATH,'//input[@id="IP"]')
-        origin=wait.until(EC.presence_of_element_located(locator))
-        origin.send_keys(origin_addr)
-        locator=(By.XPATH,'//input[@id="AccelerationDomainPort"]')
-        r_port=wait.until(EC.presence_of_element_located(locator))
-        r_port.send_keys(request_port)
-        if origin_port == "matchviewer" : 
-            locator=(By.XPATH,'//input[@id="IsAgreementFollow"]')
-            port=wait.until(EC.element_to_be_clickable(locator))
-            port.click()
-        else :
-            locator=(By.XPATH,'//input[@id="SourcePort"]')
-            port=wait.until(EC.presence_of_element_located(locator))
-            port.send_keys(origin_port)
-        # locator=(By.XPATH,'//input[@id="AccelerationArea"][@value=2]')
-        # area=wait.until(EC.element_to_be_clickable(locator))
-        # area.click()
-        locator=(By.XPATH,f'//input[@id="AccelerationType"][@value={type}]')
-        Accelerate_type=wait.until(EC.element_to_be_clickable(locator))
-        Accelerate_type.click()
+def add_domain(domainlist,request_port,origin_addr,origin_port,type,redirect=None):
+    login()
+    for domain in domainlist:
+        try:
+            locator=(By.XPATH,'//i[@class="fa fa-plus-circle"]')
+            temp=wait.until(EC.element_to_be_clickable(locator))
+            temp.click()
+            locator=(By.XPATH,'//input[@id="Domain"]')
+            d_name=wait.until(EC.presence_of_element_located(locator))
+            d_name.send_keys(domain)
+            locator=(By.XPATH,'//input[@id="IP"]')
+            origin=wait.until(EC.presence_of_element_located(locator))
+            origin.send_keys(origin_addr)
+            locator=(By.XPATH,'//input[@id="AccelerationDomainPort"]')
+            r_port=wait.until(EC.presence_of_element_located(locator))
+            r_port.send_keys(request_port)
+            # print(origin_port)
+            if origin_port == "matchviewer" : 
+                # print('1')
+                locator=(By.XPATH,'//input[@id="IsAgreementFollow"][@value="1"]')
+                port=wait.until(EC.element_to_be_clickable(locator))
+                port.click()
+            else :
+                # print('2')
+                locator=(By.XPATH,'//input[@id="SourcePort"]')
+                port=wait.until(EC.presence_of_element_located(locator))
+                port.send_keys(origin_port)
+            # locator=(By.XPATH,'//input[@id="AccelerationArea"][@value=2]')
+            # area=wait.until(EC.element_to_be_clickable(locator))
+            # area.click()
+            locator=(By.XPATH,f'//input[@id="AccelerationType"][@value={type}]')
+            Accelerate_type=wait.until(EC.element_to_be_clickable(locator))
+            Accelerate_type.click()
 
-        if redirect : 
-            locator=(By.XPATH,'//span[@class="bootstrap-switch-label"]')
-            redirect=wait.until(EC.element_to_be_clickable(locator))
-            redirect.click()
+            if redirect : 
+                locator=(By.XPATH,'//span[@class="bootstrap-switch-label"]')
+                redirect_enable=wait.until(EC.element_to_be_clickable(locator))
+                redirect_enable.click()
 
-            locator=(By.XPATH,f'//input[@name="RedirectType"][@value={redirect_type}]')
-            redirect_type=wait.until(EC.element_to_be_clickable(locator))
-            redirect_type.click()
+                # print(redirect)
+
+                locator=(By.XPATH,f'//input[@name="RedirectType"][@value={redirect}]')
+                redirect_type=wait.until(EC.element_to_be_clickable(locator))
+                redirect_type.click()
+            try:
+                locator=(By.XPATH,'//i[@class="fa fa-check-circle"]')
+                end_button=wait.until(EC.element_to_be_clickable(locator))
+                end_button.click()
+
+                locator=(By.XPATH,'//button[@id="J-alert-Ok"]')                
+                check=wait.until(EC.element_to_be_clickable(locator))
+                check.click()
+            except:
+                browser.quit()
+                login()
+                continue
+                    
+
+            print({f"{domain}":"Create completed"})
         
-        locator=(By.XPATH,'//i[@class="fa fa-check-circle"]')
-        end_button=wait.until(EC.element_to_be_clickable(locator))
-        end_button.click()
+        except : 
+            print({f"{domain}":"Something wrong, please try again."})
 
-        locator=(By.XPATH,'//button[@id="J-alert-Ok"]')
-        check=wait.until(EC.element_to_be_clickable(locator))
-        check.click()
-
-        return {f"{domain}":"Create completed"}
-    
-    except : 
-        return {f"{domain}":"Something wrong, please try again."}
-
-
+    else: browser.quit()
 
 
 
@@ -204,8 +216,7 @@ if __name__ == "__main__":
     # print(len(dlist))
     dlist=['ittlefish99.com']
 
-    login()
-    print(add_domain("bosco.com","443","http://1.1.1.1",80,3,True,302))
+    print(add_domain(['bosco1.com'],"443","http://1.1.1.1",80,3,302))
     time.sleep(5)
     # for dm in dlist : 
         # print(change_origin(dm,browser))

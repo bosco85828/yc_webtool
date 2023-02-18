@@ -1,5 +1,7 @@
 import monitor_order
 from flask import Flask, render_template, request
+import threading
+import yccdn_add_domain
 app = Flask(__name__)
 
 # @app.route("/<name>",methods=['GET'])
@@ -20,16 +22,21 @@ def ycadd():
 
 @app.route("/ycaddcompleted",methods=['POST'])
 def ycadd_completed():
+    
     domain=request.values['domain_list']
     request_port=request.values['request_port']
     origin_addr=request.values['origin_addr']
     origin_port=request.values['origin_port']
     type_=request.values['type']
-    
     redirect=request.values['redirect'] or None
-
     
-    print(domain,request_port,origin_addr,origin_port,type_,redirect)
+    domainlist=[ x for x in domain.split(',')]
+
+
+    t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(domainlist,request_port,origin_addr,origin_port,type_,redirect))
+    t1.start()
+    
+    # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)
     return render_template('yc_add_completed.html')
 
 
