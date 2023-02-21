@@ -1,4 +1,3 @@
-
 <form method="POST" action="{{url_for('ycadd_completed')}}">
     <meta charset="utf-8">
     <style type="text/css">
@@ -29,7 +28,7 @@
 <br>
 <div class="row">
     源站 IP/Cname : <br>
-    <input type="text" class="form-control" name="origin_addr" size="35" placeholder="格式請輸入完整 url , ex. https://1.1.1.1">    
+    <input type="url" class="form-control" name="origin_addr" size="35" placeholder="格式請輸入完整 url , ex. https://1.1.1.1">    
 </div>
 <br>
 <div class="row">
@@ -61,3 +60,4 @@
 <button type="submit" class="btn btn-primary" style="position: absolute; left: 500px; top: 20px">Submit</button>
 <!-- <input type="text" class="form-control" name="lastname" placeholder="Last name"> -->
 
+</form>
