@@ -11,6 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import re
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
@@ -50,6 +51,7 @@ def login(domain,right_code,browser):
     search_close= WebDriverWait(browser,10).until(EC.element_to_be_clickable(locator),"訪問出現異常")
     # print(search_close)
     search_close.click()
+    time.sleep(3)
     locator=(By.XPATH,'//div[@class="class-block-selector"]/div')
     temp=WebDriverWait(browser,10).until(EC.presence_of_all_elements_located(locator))
     # print([ x.get_attribute('class') for x in temp ])
@@ -92,7 +94,7 @@ def compare_banner(banner):
     else : return "Success"
 
 
-def main(input_):
+def main(input_,qlist):
     global browser
     browser = webdriver.Chrome(service=s, options=options)
     browser.set_page_load_timeout(120)
@@ -101,9 +103,10 @@ def main(input_):
     wrong_domain=[]
     global now_banner
     
+    dlist=[tuple(re.findall(r'[a-zA-Z.0-9]+',x)) for x in input_.split('\n') if x ]
     
-    dlist=[tuple(x.strip().split(' ')) for x in input_.split('\n') if x ]
-    # print(dlist)
+    # dlist=[tuple(x.strip().split(' ')) for x in input_.split('\n') if x ]
+    print(dlist)
     try:
         for dm,right_code in dlist:
             now_banner=[]
@@ -125,6 +128,7 @@ def main(input_):
     print(wrong_domain)
     print("\n")
     browser.quit()
+    qlist.put(wrong_domain)
     return wrong_domain
 
 if __name__ == "__main__" : 

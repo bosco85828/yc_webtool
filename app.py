@@ -1,12 +1,32 @@
 import monitor_order
+import time
 from flask import Flask, render_template, request
 import threading
+from queue import Queue
 import yccdn_add_domain
 app = Flask(__name__)
+qlist=Queue()
+lock = threading.Lock()
 
 # @app.route("/<name>",methods=['GET'])
 # def hello(name):
 #     return f"Hello,{name}"
+class MyThread(threading.Thread):
+    def __init__(self,func,args=()):
+        super(MyThread,self).__init__()
+        self.func=func
+        self.args=args
+    def run(self):
+        time.sleep(2)
+        self.result = self.func(*self.args)
+    def get_result(self):
+        threading.Thread.join(self)
+        try : 
+            return self.result
+        except Exception : 
+            return None
+        
+
 
 @app.route("/")
 def hello():
@@ -44,9 +64,19 @@ def ycadd_completed():
 @app.route("/submit",methods=['POST'])
 def submit():
     domain = request.values['test']
-    temp_1=monitor_order.main(domain)
+    # print(threading.active_count())
+    t=threading.Thread(target=monitor_order.main,args=(domain,qlist))
+    
+    # temp_1=monitor_order.main(domain)
+    t.start()
+    # lock.acquire()
+    t.join()
+
+    temp_1 = qlist.get()
+    # print(temp_1)
     temp_2=[(x.split('>')) for x in temp_1]
     result={ x:y for x,y in temp_2}
+    # lock.release()
     print(result)
     return render_template('submit.html',**locals())
     
