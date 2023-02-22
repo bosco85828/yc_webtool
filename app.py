@@ -4,6 +4,7 @@ from flask import Flask, render_template, request
 import threading
 from queue import Queue
 import yccdn_add_domain
+import sc_white
 app = Flask(__name__)
 qlist=Queue()
 lock = threading.Lock()
@@ -39,6 +40,24 @@ def form():
 @app.route("/ycadd")
 def ycadd():
     return render_template('yc_add.html')
+
+@app.route("/scwhite")
+def scwhite():
+    return render_template('scwhite.html')
+
+@app.route("/scwhitecompleted",methods=['POST'])
+def scwhite_completed():
+    input_dcodelist=request.values['domain_list']
+    input_order=request.values['data_order']
+    # print(input_dcodelist)
+    # print(input_order)
+
+    t1=threading.Thread(target=sc_white.main,args=(input_dcodelist,input_order))
+    t1.start()
+
+    
+    return render_template('scwhite_completed.html')
+
 
 @app.route("/ycaddcompleted",methods=['POST'])
 def ycadd_completed():

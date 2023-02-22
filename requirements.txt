@@ -5,3 +5,4 @@ webdriver_manager==3.8.5
 itsdangerous==2.0.1
 Jinja2==3.0.3
 werkzeug==2.0.3
+requests-toolbelt==0.10.1
