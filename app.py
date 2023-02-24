@@ -1,4 +1,5 @@
 import monitor_order
+import re
 import time
 from flask import Flask, render_template, request
 import threading
@@ -73,15 +74,15 @@ def ycadd_completed():
     type_=request.values['type']
     redirect=request.values['redirect'] or None
     cusID=request.values['customer_ID']
-
-    domainlist=[ x for x in domain.split(',')]
-
+    domainlist=re.findall(r'[a-zA-Z.:0-9]+',domain)
+    # domainlist=[ x for x in domain.split(',')]
+    # print(domainlist)
 
     t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()
     
     # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)
-    return render_template('yc_add_completed.html')
+    return render_template('yc_add_completed.html',**locals())
 
 
 @app.route("/submit",methods=['POST'])
