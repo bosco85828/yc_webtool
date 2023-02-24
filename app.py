@@ -84,6 +84,13 @@ def ycadd_completed():
     # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)
     return render_template('yc_add_completed.html',**locals())
 
+@app.route("/checkyctask")
+def checkyctask():
+    with open("ycadd.log") as f : 
+        task=f.readlines()
+    print(task)
+    
+    return render_template('check_yc_task.html',**locals())
 
 @app.route("/submit",methods=['POST'])
 def submit():

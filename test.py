@@ -1,11 +1,5 @@
-import re 
-a="""bosco.com,bosco123
-bosco111
-bosco222
-bosco333,bosco444"""
+with open("test.txt","w+") as f : 
+    a=['bosco\n','andy\n','bill']
+    for i in a : 
+        f.write(i)
 
-b=re.findall(r'[a-zA-Z.:0-9]+',a)
-
-
-
-print(b)
