@@ -64,6 +64,17 @@ def scwhite_completed():
     return render_template('scwhite_completed.html')
 
 
+@app.route("/checkscwhite")
+def checkscwhite():
+    with open("scwhite.log") as f : 
+        task=f.readlines()
+    print(task)
+    
+    return render_template('checkscwhite.html',**locals())
+
+
+
+
 @app.route("/ycaddcompleted",methods=['POST'])
 def ycadd_completed():
     
@@ -77,9 +88,12 @@ def ycadd_completed():
     domainlist=re.findall(r'[a-zA-Z.:0-9]+',domain)
     # domainlist=[ x for x in domain.split(',')]
     # print(domainlist)
-
+    with open("ycadd.log","w+") as f :
+        pass
+    
     t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()
+    
     
     # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)
     return render_template('yc_add_completed.html',**locals())

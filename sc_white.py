@@ -131,30 +131,36 @@ def add_statistics(domain,merchant,cnzz_code="",google_code="",baidu_code=""):
 
 
 def main(input_dcodelist,input_order,statistics,merchant):
-    token=get_token()
-    dcodelist=[re.findall(r'[a-zA-Z.:0-9]+',x) for x in input_dcodelist.split('\n') if x ]
-    domainlist=[ x[0] for x in dcodelist]
-    domain_str=",".join(domainlist)
-    statistics_list=[(x[0],x[2]) for x in dcodelist if x]
-    result=[]
-    result.append(str(add_white(token,domain_str)))
-    result.append(str(add_order(token,domainlist,input_order)))
-    result.append(str(add_code(token,dcodelist)))
-    
-    if str(statistics) == "0" :
-        for domain,cn_code in statistics_list : 
-            result.append(str({domain:add_statistics(domain,merchant,cnzz_code=cn_code)}))
+    with open("scwhite.log","w+") as f :
+        token=get_token()
+        dcodelist=[re.findall(r'[a-zA-Z.:0-9]+',x) for x in input_dcodelist.split('\n') if x ]
+        domainlist=[ x[0] for x in dcodelist]
+        domain_str=",".join(domainlist)
+        try:statistics_list=[(x[0],x[2]) for x in dcodelist if x]
+        except: statistics_list = None 
+        result=[]
+        result.append(str({"add_white":add_white(token,domain_str)}))
+        result.append(str({"add_order":add_order(token,domainlist,input_order)}))
+        result.append(str({"add_statistics_code":add_code(token,dcodelist)}))
+        
+        if statistics_list:
+            if str(statistics) == "0" :
+                for domain,cn_code in statistics_list : 
+                    result.append(str({domain:add_statistics(domain,merchant,cnzz_code=cn_code)}))
 
-    elif str(statistics) == "2" :
-        for domain,gg_code in statistics_list : 
-            result.append(str({domain:add_statistics(domain,merchant,google_code=gg_code)}))
-    
-    elif str(statistics) == "1" :
-        for domain,bd_code in statistics_list : 
-            result.append(str({domain:add_statistics(domain,merchant,baidu_code=bd_code)}))
+            elif str(statistics) == "2" :
+                for domain,gg_code in statistics_list : 
+                    result.append(str({domain:add_statistics(domain,merchant,google_code=gg_code)}))
+            
+            elif str(statistics) == "1" :
+                for domain,bd_code in statistics_list : 
+                    result.append(str({domain:add_statistics(domain,merchant,baidu_code=bd_code)}))
+        else : 
+            result.append("{Error:statistics_list Failed to add statistics_code, because format error.}")
 
-    print("\n".join(result))
-    return result
+        print("\n".join(result))
+        f.writelines("\n".join(result))
+        return result
 
 
 
