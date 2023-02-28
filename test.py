@@ -1,5 +1,7 @@
-with open("test.txt","w+") as f : 
-    a=['bosco\n','andy\n','bill']
-    for i in a : 
-        f.write(i)
+bosco={
+    'a':123,
+    'b':321
 
+}
+a,b=bosco.values()
+print(a)

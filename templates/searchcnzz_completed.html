@@ -1,0 +1,26 @@
+<body>
+    
+    <div class="row">
+        <div class="col">
+        <!-- <h1>{{result}}</h1> -->
+        <a href="/"> 點選回到首頁 </a>
+        <br>
+        <h3> 查詢結果如下 </h3>
+            
+            <div class="col">
+                <!-- <table cellpadding="5" border="1"> -->
+                {% for info in result %}
+                    <!-- <tr>
+                        <th> {{ info }} </th>
+                        <br>
+                    </tr> -->
+                    <a> {{ info }} </a>
+                    <br>
+                {% endfor %}
+                <!-- </table> -->
+            </div>
+
+        </div>
+    </div>
+  
+</body>

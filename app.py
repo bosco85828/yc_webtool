@@ -6,6 +6,8 @@ import threading
 from queue import Queue
 import yccdn_add_domain
 import sc_white
+import search_cnzzcode
+
 app = Flask(__name__)
 qlist=Queue()
 lock = threading.Lock()
@@ -45,6 +47,20 @@ def ycadd():
 @app.route("/scwhite")
 def scwhite():
     return render_template('scwhite.html')
+
+@app.route("/searchcnzz")
+def searchcnzz():
+    return render_template('searchcnzz.html')
+
+@app.route("/searchcnzzcompleted",methods=['POST'])
+def searchcnzz_completed():
+    input_token=request.values['token']
+    input_domain=request.values['domain']
+    
+    result=search_cnzzcode.main(input_token,input_domain)
+    print(result)
+    return render_template('searchcnzz_completed.html',**locals())
+
 
 @app.route("/scwhitecompleted",methods=['POST'])
 def scwhite_completed():
