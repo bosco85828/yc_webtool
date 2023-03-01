@@ -3,7 +3,7 @@ import re
 from bs4 import BeautifulSoup
 import threading
 
-def create_domain(domain,token):
+def create_domain(domain,cookie,token):
     
     sp.acquire()
 
@@ -13,7 +13,7 @@ def create_domain(domain,token):
             'authority':'web.umeng.com',
             'accept': '*/*',
             'accept-language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-            'cookie':token,
+            'cookie':cookie,
             'referer':'https://web.umeng.com/main.php?',
             'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             'x-requested-with':'XMLHttpRequest'
@@ -28,21 +28,22 @@ def create_domain(domain,token):
         'provinces':'16',
         'cities':'0',
         'siteinfo':None,
-        'xsftoken':'cnzz_63de26bdc976b'
+        'xsftoken':token
     }
 
     result=requests.post(url,headers=header,data=data)
 
     print(result)
+    print(result.text)
     sp.release()
     return result
 
-def main(input_domain,input_token):
+def main(input_domain,input_cookie,input_token):
     global sp 
     sp=threading.Semaphore(5)
     domainlist=re.findall(r'[a-zA-Z.:0-9-]+',input_domain)
     for domain in domainlist : 
-        t1=threading.Thread(target=create_domain,args=(domain,input_token))
+        t1=threading.Thread(target=create_domain,args=(domain,input_cookie,input_token))
         t1.start()
     
     return domainlist

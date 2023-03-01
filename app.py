@@ -61,9 +61,10 @@ def createcnzz():
 def creatd_cnzzcompleted():
 
     input_token=request.values['token']
+    input_cookie=request.values['cookie']
     input_domain=request.values['domain']
 
-    domainlist=create_cnzz.main(input_domain,input_token)
+    domainlist=create_cnzz.main(input_domain,input_cookie,input_token)
 
     print(domainlist)
 
