@@ -1,8 +1,8 @@
 FROM python:3.9.13
 
-WORKDIR /bill_web
+WORKDIR /yc_webtool
 
-COPY . /bill_web
+COPY . /yc_webtool
 
 RUN apt-get update \
     && apt-get install -y apt-transport-https vim iproute2 net-tools ca-certificates curl wget software-properties-common  unzip
