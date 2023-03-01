@@ -2,36 +2,6 @@ import requests
 import re
 from bs4 import BeautifulSoup
 
-
-def create_domain(domain):
-    url="https://web.umeng.com/main.php?c=site&a=add&ajax=module=add"
-    header={
-            'authority':'web.umeng.com',
-            'accept': '*/*',
-            'accept-language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-            'cookie':token,
-            'referer':'https://web.umeng.com/main.php?c=site&a=show',
-            'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-            'x-requested-with':'XMLHttpRequest'
-        }
-    # data={
-    #     'sitename':domain,
-    #     'domainlist':domain,
-    #     'sitedomain':domain,
-    #     'type':'IT%E7%BD%91%E7%BB%9C',
-    #     'subtype':'IT%E7%BD%91%E7%BB%9C%E5%85%B6%E5%AE%83',
-    #     'provinces':'16',
-    #     'cities':'0',
-    #     'siteinfo':None,
-    #     'xsftoken':'cnzz_63de26bdc976b'
-    # }
-
-    data_str="sitename=bosco.com&domainlist=bosco.com&sitedomain=bosco.com&type=IT%E7%BD%91%E7%BB%9C&subtype=IT%E7%BD%91%E7%BB%9C%E5%85%B6%E5%AE%83&provinces=16&cities=0&siteinfo=&xsftoken=cnzz_63de26bdc976b"
-
-    result=requests.post(url,header,data_str)
-    print(result.text)
-
-
 def get_siteid(domain):
     # domain_list=[]
     for i in range(1,7):
@@ -46,7 +16,11 @@ def get_siteid(domain):
             'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             'x-requested-with':'XMLHttpRequest'
         }
+        
         result=requests.get(url,headers=header).json()
+        
+        
+        
         # domain = [ x['domain'] for x in result['data']['list']['items']]    
         # domain_list += domain
 

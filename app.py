@@ -7,6 +7,7 @@ from queue import Queue
 import yccdn_add_domain
 import sc_white
 import search_cnzzcode
+import create_cnzz
 
 app = Flask(__name__)
 qlist=Queue()
@@ -51,6 +52,22 @@ def scwhite():
 @app.route("/searchcnzz")
 def searchcnzz():
     return render_template('searchcnzz.html')
+
+@app.route("/createcnzz")
+def createcnzz():
+    return render_template('createcnzz.html')
+
+@app.route("/createcnzzcompleted",methods=['POST'])
+def creatd_cnzzcompleted():
+
+    input_token=request.values['token']
+    input_domain=request.values['domain']
+
+    domainlist=create_cnzz.main(input_domain,input_token)
+
+    print(domainlist)
+
+    return render_template('creatd_cnzzcompleted.html',**locals())
 
 @app.route("/searchcnzzcompleted",methods=['POST'])
 def searchcnzz_completed():
