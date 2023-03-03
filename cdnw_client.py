@@ -57,7 +57,7 @@ def send_request(access_key, secret_key, host, uri, method, post_request_body):
         res = requests.put('https://{}'.format(host) + uri, data=json.dumps(post_request_body), headers=headers)
     elif method.upper() == 'DELETE':
         res = requests.delete('https://{}'.format(host) + uri, headers=headers)
-    pprint(res.text)
+    # pprint(res.text)
     return res
 
 

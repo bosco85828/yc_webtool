@@ -8,6 +8,7 @@ import yccdn_add_domain
 import sc_white
 import search_cnzzcode
 import create_cnzz
+import uploadSSL
 
 app = Flask(__name__)
 qlist=Queue()
@@ -49,6 +50,10 @@ def ycadd():
 def scwhite():
     return render_template('scwhite.html')
 
+@app.route("/cdnwuploadssl")
+def cdnwuploadssl():
+    return render_template('cdnw_uploadSSL.html')
+
 @app.route("/searchcnzz")
 def searchcnzz():
     return render_template('searchcnzz.html')
@@ -56,6 +61,23 @@ def searchcnzz():
 @app.route("/createcnzz")
 def createcnzz():
     return render_template('createcnzz.html')
+
+@app.route("/checkcdnwssllog")
+def check_cdnw_ssllog():
+    with open('cdnw_uploadssl.log') as f :
+        task=f.readlines()
+    # print(task)
+    return render_template('check_cdnw_ssllog.html',**locals())
+
+@app.route("/cdnwuploadsslcompleted",methods=['POST'])
+def cdnw_uploadssl_completed():
+    input_domain=request.values['domain']
+    
+    t1=threading.Thread(target=uploadSSL.main,args=(input_domain,))
+    t1.start()
+    
+    return render_template('cdnw_uploadSSL_completed.html')
+
 
 @app.route("/createcnzzcompleted",methods=['POST'])
 def creatd_cnzzcompleted():
