@@ -1,3 +1,4 @@
-{'m.bosco.live': 'The SSL name you provided is already in our system.'}
-{'m.bosco.com': 'YCCDN SSL does not exist.'}
-{'www.bosco.live': 'YCCDN SSL does not exist.'}
+{'test.bosco.live': 'The SSL name you provided is already in our system.'}
+{'m.bosco.live': 'success'}
+{'1.bosco.live': 'YCCDN SSL does not exist.'}
+{'2.bosco.live': 'YCCDN SSL does not exist.'}

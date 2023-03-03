@@ -3,6 +3,7 @@ import re
 from bs4 import BeautifulSoup
 import threading
 import cdnw_client
+import time
 global AccessKey,SecretKey,host
 AccessKey = 'qG3fh4K9ZFbapLm8ASHsdeyeAF9JmlFv6mbK'
 SecretKey = 'J6NZfEAVLKEZ4nDWyaSzpFFVYtYERVWSDQYayDNcW0l5uCwAJKEHVBYgLCas0cq6'
@@ -35,13 +36,20 @@ def check_cdnw_certid(cert_name):
     http_method = 'GET'
     uri='/api/ssl/certificate'
     post_request_body={}
-    data=cdnw_client.send_request(AccessKey, SecretKey, host, uri, http_method, post_request_body)
-    soup=BeautifulSoup(data.text,'xml')
-    certs=soup.find_all('ssl-certificate')
-    cert=[ x for x in certs if x.find('name').get_text()==cert_name ]
-    # print(cert[0].find('certificate-id').get_text())
+    while True :
+        time.sleep(1)
+        data=cdnw_client.send_request(AccessKey, SecretKey, host, uri, http_method, post_request_body)
+        soup=BeautifulSoup(data.text,'xml')
+        certs=soup.find_all('ssl-certificate')
+        cert=[ x for x in certs if x.find('name').get_text()==cert_name ]
+        try : 
+            return cert[0].find('certificate-id').get_text()
+        except IndexError : 
+            continue
     
-    return cert[0].find('certificate-id').get_text()
+    
+    
+
 
 def set_cdnwdomain_cert(domain,certid):
     http_method = "PUT"
@@ -88,7 +96,7 @@ def main(input_domain):
 
 
 if __name__ == "__main__":
-    domain="m.bosco.live"
+    domain="test.bosco.live"
     data=get_yc_ssl(domain)
     cert=data['cert']
     key=data['key']
