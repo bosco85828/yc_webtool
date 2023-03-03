@@ -36,16 +36,12 @@ def check_cdnw_certid(cert_name):
     http_method = 'GET'
     uri='/api/ssl/certificate'
     post_request_body={}
-    while True :
-        time.sleep(1)
-        data=cdnw_client.send_request(AccessKey, SecretKey, host, uri, http_method, post_request_body)
-        soup=BeautifulSoup(data.text,'xml')
-        certs=soup.find_all('ssl-certificate')
-        cert=[ x for x in certs if x.find('name').get_text()==cert_name ]
-        try : 
-            return cert[0].find('certificate-id').get_text()
-        except IndexError : 
-            continue
+    data=cdnw_client.send_request(AccessKey, SecretKey, host, uri, http_method, post_request_body)
+    soup=BeautifulSoup(data.text,'xml')
+    certs=soup.find_all('ssl-certificate')
+    cert=[ x for x in certs if x.find('name').get_text()==cert_name ]
+    
+    return cert[0].find('certificate-id').get_text()
     
     
     
@@ -79,7 +75,20 @@ def main(input_domain):
         if cert and key : 
             upload_result=upload_cdnw(domain,cert,key)
             if upload_result.status_code == 200 :
-                result_log.append(str({domain:set_cdnwdomain_cert(domain,check_cdnw_certid(domain))}))
+                while True:
+                    try:
+                        certid=check_cdnw_certid(domain)
+
+                    except IndexError:
+                        time.sleep(2)
+                        continue
+
+                    result_log.append(str({domain:set_cdnwdomain_cert(domain,certid)}))
+                    break
+
+            elif "already" in upload_result.text : 
+                certid=check_cdnw_certid(domain)
+                result_log.append(str({domain:set_cdnwdomain_cert(domain,certid)}))
 
             else :
                 soup=BeautifulSoup(upload_result.text,'xml')
@@ -100,13 +109,14 @@ if __name__ == "__main__":
     data=get_yc_ssl(domain)
     cert=data['cert']
     key=data['key']
+    print(upload_cdnw(domain,cert,key).text)
     # print(data)
     # print(bool(cert))
     # print(cert)
     # print(len(cert))
-    print(cert)
-    print(key)
-    print("is cert == key? {}".format(cert==key))
+    # print(cert)
+    # print(key)
+    # print("is cert == key? {}".format(cert==key))
 
 #     cert="""-----BEGIN CERTIFICATE-----
 # MIIEUjCCAzqgAwIBAgISBFMNwkFH/z6UCnpWZ7JF5zqqMA0GCSqGSIb3DQEBCwUA
@@ -201,11 +211,12 @@ if __name__ == "__main__":
 # 2TXB/8hwCVFi655QrrJA3zTiXGPfQBzjD9w1on4TsbxU4F1OP4cw6Ebu
 # -----END PRIVATE KEY-----"""
 #     key="123"
-#     cert_name='billtest303'
-#     print(upload_cdnw(cert_name,cert,key).text)
-#     cert_id=check_cdnw_certid(cert_name)
-#     print(cert_id)
-#     print(set_cdnwdomain_cert('www.bosco.live',cert_id))
+    # cert_name='test.bosco.live'
+    # if "already" in upload_cdnw(cert_name,cert,key).text : 
+    #     print(123)
+    # cert_id=check_cdnw_certid(cert_name)
+    # print(cert_id)
+    # print(set_cdnwdomain_cert(domain,cert_id))
     
     
     
