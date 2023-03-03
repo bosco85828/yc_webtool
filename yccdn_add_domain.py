@@ -161,6 +161,10 @@ def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redire
                     login(cusID)
                     # f.write("{}\n".format({f"{domain}":"Something wrong, please try again."}))
 
+            time.sleep(5)
+
+
+
         else: browser.quit()
 
 
