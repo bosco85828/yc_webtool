@@ -169,8 +169,9 @@ def checkyctask():
 @app.route("/submit",methods=['POST'])
 def submit():
     domain = request.values['test']
+    banner = request.values['banner']
     # print(threading.active_count())
-    t=threading.Thread(target=monitor_order.main,args=(domain,qlist))
+    t=threading.Thread(target=monitor_order.main,args=(domain,qlist,banner))
     
     # temp_1=monitor_order.main(domain)
     t.start()

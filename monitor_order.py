@@ -57,17 +57,18 @@ def login(domain,right_code,browser):
     # print([ x.get_attribute('class') for x in temp ])
     banner=browser.find_elements(By.XPATH,'//div[@class="class-block-selector"]/div')
     compare_result=compare_banner(banner)
+    
     if compare_result != "Success" : 
         wrong_domain.append(f"{domain}>{compare_result}, Now:{now_banner}.")
         return f"{domain}, {compare_result}, Now:{now_banner}."
 
     # temp=browser.find_element(By.XPATH,'//div[@class="login-wrapper"]/img[2]')
-    locator=(By.XPATH,'//div[@class="login-wrapper"]/img[2]')
-    temp= WebDriverWait(browser,10).until(EC.element_to_be_clickable(locator),"訪問出現異常")
-    # print(temp)
-    temp.click()
-    
-
+    # locator=(By.XPATH,'//div[@class="login-wrapper"]/img[1]')
+    # temp= WebDriverWait(browser,10).until(EC.element_to_be_clickable(locator),"訪問出現異常")
+    # print(123)
+    # # print(temp)
+    # temp.click()
+    browser.get(f"https://{domain}/regist")
     # temp=browser.find_element(By.XPATH,'//div[@class="swiper-slide swiper-slide-active"]//form/div[4]//input')
     locator=(By.XPATH,'//div[@class="swiper-slide swiper-slide-active"]//form/div[4]//input')
     temp=WebDriverWait(browser,10).until(EC.presence_of_element_located(locator),"找不到邀請碼")
@@ -80,10 +81,14 @@ def login(domain,right_code,browser):
 
 
 def compare_banner(banner):
-
-    banner_list=list(enumerate(["electronic","live","qpgame","cpgame","hunter","sports","esports"]))
+    banner_list=["electronic","live","qpgame","cpgame","hunter","sports","esports","hotgame"]
+    banner_result=[ (int(order[x])-1,banner_list[x]) for x in range(len(order))]
+    banner_result.sort(key=lambda x : x[0])
+    # print(order)
+    # print(banner_result)
+    # banner_list=list(enumerate(["electronic","live","qpgame","cpgame","hunter","sports","esports"]))
     
-    for index,value in banner_list:
+    for index,value in banner_result:
         
         temp_banner=banner[index].get_attribute('class').split(" ")[-1]
         now_banner.append(temp_banner)     
@@ -94,7 +99,7 @@ def compare_banner(banner):
     else : return "Success"
 
 
-def main(input_,qlist):
+def main(input_,qlist,input_order):
     global browser
     browser = webdriver.Chrome(service=s, options=options)
     browser.set_page_load_timeout(120)
@@ -102,8 +107,10 @@ def main(input_,qlist):
     global wrong_domain
     wrong_domain=[]
     global now_banner
+    global order 
+    order = input_order
     
-    dlist=[tuple(re.findall(r'[a-zA-Z.0-9]+',x)) for x in input_.split('\n') if x ]
+    dlist=[tuple(re.findall(r'[a-zA-Z.0-9-]+',x)) for x in input_.split('\n') if x ]
     
     # dlist=[tuple(x.strip().split(' ')) for x in input_.split('\n') if x ]
     print(dlist)
