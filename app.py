@@ -170,20 +170,22 @@ def checkyctask():
 def submit():
     domain = request.values['test']
     banner = request.values['banner']
+    statistics = request.values['statistics']
     # print(threading.active_count())
-    t=threading.Thread(target=monitor_order.main,args=(domain,qlist,banner))
+    t=threading.Thread(target=monitor_order.main,args=(domain,qlist,banner,statistics))
     
     # temp_1=monitor_order.main(domain)
     t.start()
     # lock.acquire()
     t.join()
-
+    correct_count=qlist.get()
     temp_1 = qlist.get()
     # print(temp_1)
     temp_2=[(x.split('>')) for x in temp_1]
     result={ x:y for x,y in temp_2}
     # lock.release()
     print(result)
+    print(correct_count)
     return render_template('submit.html',**locals())
     
 

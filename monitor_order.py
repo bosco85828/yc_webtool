@@ -5,7 +5,8 @@
 Command:
     python monitor_order.py
 """
-
+import requests
+from bs4 import BeautifulSoup
 from selenium.common.exceptions import NoSuchElementException,TimeoutException,WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -31,6 +32,23 @@ options.add_argument('--disable-dev-shm-usage')
 s=Service(ChromeDriverManager().install())
 
 
+def compare_cnzz(domain):
+    url="https://{}/".format(domain)
+    result=requests.get(url)
+    soup=BeautifulSoup(result.text,'lxml')
+    data=soup.find_all('script')
+
+    ans=[ x.string for x in data if x.string != None and "cnzz_s_tag.src" in x.string ]
+
+    data=ans[0].split('\n')
+    for i in data : 
+        if "cnzz_s_tag.src" in i :
+            result=i.strip()
+
+    cnzz_id=re.search(r'id=(\d+)',result).group(1)
+    cnzz_domain=re.search(r'https://([0-9a-zA-Z.-]+)',result).group(1)
+
+    return f"{cnzz_domain}:{cnzz_id}"
 
 
 def login(domain,right_code,browser):
@@ -77,7 +95,7 @@ def login(domain,right_code,browser):
         wrong_domain.append(f"{domain}>The code is wrong, Wrong code: {code}, Correct: {right_code}.")
         return f"{domain}, The code is wrong, Wrong code: {code}, Correct: {right_code}."
     
-    return f"{domain}, Completed."
+    return "Completed"
 
 
 def compare_banner(banner):
@@ -99,7 +117,10 @@ def compare_banner(banner):
     else : return "Success"
 
 
-def main(input_,qlist,input_order):
+def main(input_,qlist,input_order,statistics):
+    global correct_domain
+    correct_domain=[]
+    
     global browser
     browser = webdriver.Chrome(service=s, options=options)
     browser.set_page_load_timeout(120)
@@ -110,31 +131,82 @@ def main(input_,qlist,input_order):
     global order 
     order = input_order
     
-    dlist=[tuple(re.findall(r'[a-zA-Z.0-9-]+',x)) for x in input_.split('\n') if x ]
+    dlist=[tuple(re.findall(r'[a-zA-Z.0-9-:]+',x)) for x in input_.split('\n') if x ]
     
     # dlist=[tuple(x.strip().split(' ')) for x in input_.split('\n') if x ]
-    print(dlist)
-    try:
-        for dm,right_code in dlist:
-            now_banner=[]
-            try : 
-                print(login(dm,right_code,browser))
-            except TimeoutException : 
-                print(f"{dm} check timeout.")
-                wrong_domain.append(f"{dm}>check timeout.")
-                continue
-            except :
-                wrong_domain.append(f"{dm}>Something wrong,please try again.") 
-                print(f"{dm} Something wrong")
-                continue
-    except ValueError : 
-        raise ValueError("Please check the domain.txt format.")
+    # print(dlist)
+    if str(statistics) == "0" :
+        try:
+            for dm,right_code in dlist:
+                
+                now_banner=[]
+                try : 
+                    if login(dm,right_code,browser) != "Completed" : 
+                        continue
+
+                except TimeoutException : 
+                    print(f"{dm} check timeout.")
+                    wrong_domain.append(f"{dm}>check timeout.")
+                    continue
+                except :
+                    wrong_domain.append(f"{dm}>Something wrong,please try again.") 
+                    print(f"{dm} Something wrong")
+                    continue
+                
+                correct_domain.append(dm)
+                print(f"{dm}, Completed.")
+
+        except ValueError : 
+            wrong_domain.append("格式錯誤>請確認格式是否符合範例。")
+            # raise ValueError("Please check the domain.txt format.")
+    else:
+        try:
+            for dm,right_code,statistics_code in dlist:
+                
+                now_banner=[]
+                #比對選單順序以及驗證碼
+                try : 
+                    if login(dm,right_code,browser) != "Completed" : 
+                        continue
+
+                except TimeoutException : 
+                    print(f"{dm} check timeout.")
+                    wrong_domain.append(f"{dm}>check timeout.")
+                    continue
+                except :
+                    wrong_domain.append(f"{dm}>Something wrong,please try again.") 
+                    print(f"{dm} Something wrong")
+                    continue
+                
+                #比對統計碼
+                try : 
+                    now_cnzz=compare_cnzz(dm)
+                except : 
+                    wrong_domain.append(f"{dm}>Can't find cnzz code.")
+                    print(f"{dm}>Can't find cnzz code.")
+                    continue
+
+                if statistics_code != now_cnzz:
+                    wrong_domain.append(f"{dm}>Cnzz_code is wrong, the current statistics code on the website is {now_cnzz}.")
+                    print(f"{dm}>Cnzz_code is wrong, the current statistics code on the website is {now_cnzz}.")
+                    continue
+                
+                correct_domain.append(dm)
+                print(f"{dm}, Completed.")
+
+
+
+        except ValueError : 
+            wrong_domain.append("格式錯誤>請確認格式是否符合範例。")
+            # raise ValueError("Please check the domain.txt format.")
 
     print("========================================")
     print(f"Wrong domain : {len(wrong_domain)}")
+    print(f"Correct domain : {len(correct_domain)}")
     print(wrong_domain)
     print("\n")
     browser.quit()
+    qlist.put(len(correct_domain))
     qlist.put(wrong_domain)
     return wrong_domain
 

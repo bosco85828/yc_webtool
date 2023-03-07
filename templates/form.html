@@ -97,12 +97,21 @@
             <input type="text" class="form-control" id="exampleFormControlInput1" name="banner" placeholder="請輸入順序，以 SC-h5 默認順序來說（热门、电子、真人、棋牌、彩票、捕鱼、体育、电竞)，就是填寫 23456781。" required="required">
         </div>
         <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label"> 統計碼供應商 : </label>
+            <select class="form-select" aria-label="Default select example" name="statistics" required>
+                <option value="0"> 無（不檢查統計碼） </option>
+                <option value="1"> 友盟cnzz </option>
+                <option value="2" disabled="disabled"> 百度 </option>
+                <option value="3" disabled="disabled"> Google </option>
+            </select>
+        </div>
+        <div class="mb-3">
             <br>
-            <label for="exampleFormControlTextarea1" class="form-label"> 域名＆邀請碼 : </label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" name="test" required="required" rows="20" placeholder="請輸入域名邀請碼格式請參照以下，中間為半形空格。
-            bill.com 1234
-            bill.live 4321
-            bill.cn 2222"></textarea>
+            <label for="exampleFormControlTextarea1" class="form-label"> 域名＆邀請碼＆統計碼 : </label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" name="test" required="required" rows="20" placeholder="請輸入域名邀請碼統計碼格式請參照以下，中間為半形空格。
+            bill.com 1234 s4.cnzz.com:1281241590
+            bill.live 4321 s4.cnzz.com:1281241594
+            bill.cn 2222 v1.cnzz.com:1281241598"></textarea>
         </div>
         <!-- <textarea type="text" class="form-control" name="test" rows="20" cols="50" placeholder="請輸入域名邀請碼格式請參照以下，中間為半形空格。
         bill.com 1234

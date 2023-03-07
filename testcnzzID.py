@@ -13,5 +13,7 @@ data=ans[0].split('\n')
 for i in data : 
     if "cnzz_s_tag.src" in i :
         result=i.strip()
+print(result)
 print(re.search(r'id=(\d+)',result).group(1))
+print(re.search(r'https://([0-9a-zA-Z.-]+)',result).group(1))
 
