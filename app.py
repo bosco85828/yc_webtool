@@ -9,6 +9,7 @@ import sc_white
 import search_cnzzcode
 import create_cnzz
 import uploadSSL
+from datetime import datetime
 
 app = Flask(__name__)
 qlist=Queue()
@@ -144,8 +145,11 @@ def ycadd_completed():
     domainlist=re.findall(r'[a-zA-Z.:0-9]+',domain)
     # domainlist=[ x for x in domain.split(',')]
     # print(domainlist)
-    with open("ycadd.log","w+") as f :
-        pass
+    # with open("ycadd.log","r+") as f :
+    #     old_content=f.read()
+    #     f.seek(0)
+    #     f.write(f"\n{datetime.now()}\n")
+    #     f.write(old_content)
     
     t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()

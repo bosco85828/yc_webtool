@@ -1,5 +1,7 @@
 import requests
+from datetime import datetime,timezone,timedelta
 import re
+
 
 def get_token():
     url="https://api.speedfan66.com/api/admin/SysAdminLogin/Login"
@@ -131,7 +133,8 @@ def add_statistics(domain,merchant,cnzz_code="",google_code="",baidu_code=""):
 
 
 def main(input_dcodelist,input_order,statistics,merchant):
-    with open("scwhite.log","w+") as f :
+    with open("scwhite.log","r+") as f :
+        
         token=get_token()
         dcodelist=[re.findall(r'[a-zA-Z.:0-9]+',x) for x in input_dcodelist.split('\n') if x ]
         domainlist=[ x[0] for x in dcodelist]
@@ -159,7 +162,15 @@ def main(input_dcodelist,input_order,statistics,merchant):
             result.append("{Error:statistics_list Failed to add statistics_code, because format error.}")
 
         print("\n".join(result))
+        now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
+        old_content=f.read()
+        f.seek(0)
+        f.write(f"\n{now_time}\n")
         f.writelines("\n".join(result))
+        f.write("\n"+old_content)
+        
+
+
         return result
 
 

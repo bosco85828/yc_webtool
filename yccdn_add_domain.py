@@ -6,7 +6,7 @@ Command:
     python3 py_programming02.py
 """
 
-
+from datetime import datetime,timezone,timedelta
 from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -92,7 +92,9 @@ def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redire
     
         login(cusID)
         for domain in domainlist:
-            with open("ycadd.log","a+") as f :
+            with open("ycadd.log","r+") as f :
+                old_content=f.read()
+                f.seek(0)
 
                 try:
                     locator=(By.XPATH,'//i[@class="fa fa-plus-circle"]')
@@ -146,6 +148,7 @@ def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redire
                     except:
                         browser.quit()
                         f.write("{}\n".format({f"{domain}":"The domain has already been created or entered in the wrong format, please check in YCCDN admin."}))
+                        f.write(old_content)
                         login(cusID)
                         
                         continue
@@ -153,19 +156,25 @@ def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redire
 
                     print({f"{domain}":"Create completed"})
                     f.write("{}\n".format({f"{domain}":"Create completed"}))
+                    f.write(old_content)
                 
                 except : 
                     print({f"{domain}":"Something wrong, please try again."})
                     f.write("{}\n".format({f"{domain}":"Something wrong, please try again."}))
+                    f.write(old_content)
                     browser.quit()
                     login(cusID)
                     # f.write("{}\n".format({f"{domain}":"Something wrong, please try again."}))
 
             time.sleep(5)
-
-
-
         else: browser.quit()
+        now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
+        with open("ycadd.log","r+") as f :
+            old_content=f.read()
+            f.seek(0)
+            f.write(f"\n{now_time}\n")
+            f.write(old_content)
+
 
 
 

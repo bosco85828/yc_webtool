@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import threading
 import cdnw_client
 import time
+from datetime import datetime,timezone,timedelta
 global AccessKey,SecretKey,host
 AccessKey = 'qG3fh4K9ZFbapLm8ASHsdeyeAF9JmlFv6mbK'
 SecretKey = 'J6NZfEAVLKEZ4nDWyaSzpFFVYtYERVWSDQYayDNcW0l5uCwAJKEHVBYgLCas0cq6'
@@ -100,8 +101,13 @@ def main(input_domain):
     
     
     print("\n".join(result_log))
-    with open('cdnw_uploadssl.log','w+') as f : 
+    now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
+    with open('cdnw_uploadssl.log','r+') as f : 
+        old_content=f.read()
+        f.seek(0)
+        f.write(f"\n{now_time}\n")
         f.write("\n".join(result_log))
+        f.write("\n"+old_content)
 
 
 if __name__ == "__main__":
