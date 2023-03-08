@@ -136,7 +136,7 @@ def main(input_dcodelist,input_order,statistics,merchant):
     with open("scwhite.log","r+") as f :
         
         token=get_token()
-        dcodelist=[re.findall(r'[a-zA-Z.:0-9]+',x) for x in input_dcodelist.split('\n') if x ]
+        dcodelist=[re.findall(r'[a-zA-Z.:0-9,-]+',x) for x in input_dcodelist.split('\n') if x ]
         domainlist=[ x[0] for x in dcodelist]
         domain_str=",".join(domainlist)
         try:statistics_list=[(x[0],x[2]) for x in dcodelist if x]
