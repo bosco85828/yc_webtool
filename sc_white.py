@@ -23,7 +23,10 @@ def get_token():
     return result['data']['token']
 
 
-def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2):
+def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None):
+    domain_list = list(set(dlist) - all_domain)
+    domain_str=",".join(domain_list)
+    # print(domain_str)
     url="https://api.speedfan66.com/api/admin/SysMerchantDomainInfo/Create"
     header={
         'authority':'api.speedfan66.com',
@@ -40,7 +43,7 @@ def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2):
         'type':type_,
         'isOnly':False,
         'isPC':False,
-        'domain':dlist,
+        'domain':domain_str,
         'isHttps':False,
         'isDisable':False,
         'platformNameId':platformNameId
@@ -131,6 +134,36 @@ def add_statistics(domain,merchant,cnzz_code="",google_code="",baidu_code=""):
     # print(result)
     return result
 
+def check_white(token):
+    url="https://api.speedfan66.com/api/admin/SysMerchantDomainInfo/PageList"
+    header={
+        'authority':'api.speedfan66.com',
+        'accept':'application/json, text/plain, */*',
+        'authorization': f'Bearer {token}',
+        'content-type':'application/json',
+        'origin': 'http://admin.howfunwedo.com',
+        'referer': 'http://admin.howfunwedo.com/',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'        
+    }
+
+    data={
+        'merchantId':1,
+        'type':0,
+        'pageIndex':1,
+        'pageSize':1,
+        'platformNameId':2
+    }
+
+    result=requests.post(url,headers=header,json=data).json()
+
+    total_size=result['data']['total']
+
+    data['pageSize'] = total_size
+
+    result=requests.post(url,headers=header,json=data).json()
+
+    domain_list=[ x['domain'] for x in result['data']['dataList'] if x ]
+    return set(domain_list)
 
 def main(input_dcodelist,input_order,statistics,merchant):
     with open("scwhite.log","r+") as f :
@@ -138,11 +171,11 @@ def main(input_dcodelist,input_order,statistics,merchant):
         token=get_token()
         dcodelist=[re.findall(r'[a-zA-Z.:0-9,-]+',x) for x in input_dcodelist.split('\n') if x ]
         domainlist=[ x[0] for x in dcodelist]
-        domain_str=",".join(domainlist)
+        # domain_str=",".join(domainlist)
         try:statistics_list=[(x[0],x[2]) for x in dcodelist if x]
         except: statistics_list = None 
         result=[]
-        result.append(str({"add_white":add_white(token,domain_str)}))
+        result.append(str({"add_white":add_white(token,domainlist,all_domain=check_white(token))}))
         result.append(str({"add_order":add_order(token,domainlist,input_order)}))
         result.append(str({"add_statistics_code":add_code(token,dcodelist)}))
         

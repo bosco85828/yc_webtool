@@ -1,4 +1,17 @@
 
+2023-03-08 15:04:11.937522+08:00
+{'add_white': {'refreshTime': 1678259111, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{'add_order': {'refreshTime': 1678259111, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{'add_statistics_code': {'refreshTime': 1678259112, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{Error:statistics_list Failed to add statistics_code, because format error.}
+
+2023-03-08 15:02:05.400303+08:00
+{'add_white': {'refreshTime': 1678258983, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{'add_order': {'refreshTime': 1678258984, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{'add_statistics_code': {'refreshTime': 1678258985, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
+{'bill.com': 'array(3) {\n  ["cnzz"]=>\n  string(7) "s9:1234"\n  ["google"]=>\n  string(0) ""\n  ["baidu"]=>\n  string(0) ""\n}\nupdate.update.update.'}
+{'bosco.com': 'array(3) {\n  ["cnzz"]=>\n  string(7) "s1:4321"\n  ["google"]=>\n  string(0) ""\n  ["baidu"]=>\n  string(0) ""\n}\nadd.update.update.'}
+
 2023-03-07 12:38:17.710595+08:00
 {'add_white': {'refreshTime': 1678163957, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
 {'add_order': {'refreshTime': 1678163957, 'isSuccess': True, 'errorCode': 10000, 'message': '', 'location': '', 'data': '创建成功'}}
