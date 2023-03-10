@@ -166,6 +166,13 @@ def check_white(token):
     return set(domain_list)
 
 def main(input_dcodelist,input_order,statistics,merchant):
+    try : 
+        testfile = open("scwhite.log","r+")
+        testfile.close()
+    except FileNotFoundError :
+        testfile = open("scwhite.log","w+")
+        testfile.close()
+
     with open("scwhite.log","r+") as f :
         
         token=get_token()

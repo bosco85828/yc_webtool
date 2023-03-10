@@ -9,6 +9,7 @@ import sc_white
 import search_cnzzcode
 import create_cnzz
 import uploadSSL
+import alidns_set
 from datetime import datetime
 
 app = Flask(__name__)
@@ -62,6 +63,21 @@ def searchcnzz():
 @app.route("/createcnzz")
 def createcnzz():
     return render_template('createcnzz.html')
+
+@app.route("/alidnsadddomain")
+def alidns_add_domain():
+    return render_template('alidns_add_domain.html')
+
+@app.route("/alidnsadddomaincompleted",methods=['POST'])
+def alidns_add_domain_completed():
+    input_customer_name=request.values['c_name']
+    input_domain=request.values['domain']
+    dlist=re.findall(r'[0-9a-zA-Z:.-]+',input_domain)
+    t1=threading.Thread(target=alidns_set.add_domain,args=(input_customer_name,dlist))
+    t1.start()
+    # result_list=alidns_set.add_domain(input_customer_name,dlist)
+    
+    return render_template('alidns_add_domain_completed.html',**locals())
 
 @app.route("/checkcdnwssllog")
 def check_cdnw_ssllog():
@@ -142,7 +158,7 @@ def ycadd_completed():
     type_=request.values['type']
     redirect=request.values['redirect'] or None
     cusID=request.values['customer_ID']
-    domainlist=re.findall(r'[a-zA-Z.:0-9]+',domain)
+    domainlist=re.findall(r'[a-zA-Z.:0-9-]+',domain)
     # domainlist=[ x for x in domain.split(',')]
     # print(domainlist)
     # with open("ycadd.log","r+") as f :
@@ -165,6 +181,15 @@ def checkyctask():
     print(task)
     
     return render_template('check_yc_task.html',**locals())
+
+@app.route("/checkalidnsdomaintask")
+def check_alidns_adddomainlog():
+    with open("alidns_adddomain.log") as f : 
+        task=f.readlines()
+    print(task)
+    
+    return render_template('check_alidns_adddomainlog.html',**locals())
+
 
 @app.route("/submit",methods=['POST'])
 def submit():

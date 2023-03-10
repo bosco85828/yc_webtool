@@ -8,3 +8,5 @@ werkzeug==2.0.3
 requests-toolbelt==0.10.1
 gunicorn==20.1.0
 lxml==4.9.2
+aliyun-python-sdk-alidns==3.0.1
+aliyun-python-sdk-core-v3==2.13.33

@@ -102,12 +102,18 @@ def main(input_domain):
     
     print("\n".join(result_log))
     now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
-    with open('cdnw_uploadssl.log','r+') as f : 
-        old_content=f.read()
-        f.seek(0)
-        f.write(f"\n{now_time}\n")
-        f.write("\n".join(result_log))
-        f.write("\n"+old_content)
+    try:
+        with open('cdnw_uploadssl.log','r+') as f : 
+            old_content=f.read()
+            f.seek(0)
+            f.write(f"\n{now_time}\n")
+            f.write("\n".join(result_log))
+            f.write("\n"+old_content)
+    except FileNotFoundError :
+        with open('cdnw_uploadssl.log','w+') as f : 
+            f.write(f"\n{now_time}\n")
+            f.write("\n".join(result_log))
+            
 
 
 if __name__ == "__main__":
