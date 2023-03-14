@@ -67,9 +67,13 @@ def yc_openhttps_completed():
 
 @app.route("/checkychttps")
 def check_yc_https():
-    with open('ychttps.log') as f :
-        task=f.readlines()
-    print(task)
+    try :
+        with open('ychttps.log') as f :
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
+
     return render_template('check_yc_httpslog.html',**locals())
 
 
@@ -110,9 +114,13 @@ def alidns_add_domain_completed():
 
 @app.route("/checkcdnwssllog")
 def check_cdnw_ssllog():
-    with open('cdnw_uploadssl.log') as f :
-        task=f.readlines()
-    # print(task)
+    try:
+        with open('cdnw_uploadssl.log') as f :
+            task=f.readlines()
+        # print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
+
     return render_template('check_cdnw_ssllog.html',**locals())
 
 @app.route("/cdnwuploadsslcompleted",methods=['POST'])
@@ -168,9 +176,12 @@ def scwhite_completed():
 
 @app.route("/checkscwhite")
 def checkscwhite():
-    with open("scwhite.log") as f : 
-        task=f.readlines()
-    print(task)
+    try:
+        with open("scwhite.log") as f : 
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
     
     return render_template('checkscwhite.html',**locals())
 
@@ -205,9 +216,12 @@ def ycadd_completed():
 
 @app.route("/checkyctask")
 def checkyctask():
-    with open("ycadd.log") as f : 
-        task=f.readlines()
-    print(task)
+    try:
+        with open("ycadd.log") as f : 
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
     
     return render_template('check_yc_task.html',**locals())
 
