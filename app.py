@@ -10,6 +10,7 @@ import search_cnzzcode
 import create_cnzz
 import uploadSSL
 import alidns_set
+import yc_https_set
 from datetime import datetime
 
 app = Flask(__name__)
@@ -43,6 +44,34 @@ def hello():
 @app.route("/form")
 def form():
     return render_template('form.html')
+
+
+
+@app.route("/ycopenhttps")
+def yc_openhttps():
+    return render_template('yc_openhttps.html')
+
+@app.route("/ycopenhttpscompleted",methods=['POST'])
+def yc_openhttps_completed():
+    input_domain=request.values['domain_list']
+    input_cusid=request.values['customer_ID']
+    input_port=request.values['request_port']
+    input_force=request.values['type']
+
+    domainlist=re.findall(r'[a-zA-Z.:0-9-]+',input_domain)
+
+    t1=threading.Thread(target=yc_https_set.change_set,args=(input_cusid,domainlist,input_port,input_force))
+    t1.start()
+
+    return render_template('yc_openhttps_completed.html',**locals())
+
+@app.route("/checkychttps")
+def check_yc_https():
+    with open('ychttps.log') as f :
+        task=f.readlines()
+    print(task)
+    return render_template('check_yc_httpslog.html',**locals())
+
 
 @app.route("/ycadd")
 def ycadd():

@@ -74,68 +74,25 @@
 </head>
 
 <body>
-    <div class="container">
-        <form method="POST" action="{{url_for('submit')}}">
-            <meta charset="utf-8">
-            <style type="text/css">
-                .btn{
-                    background-color:orange;
-                    border: none;
-                    font-size: 20px;
-                    font-weight: normal;
-                    color: #0c3e29;
-                    outline:none;
-                    cursor:pointer;
-                    padding: 15px 25px ;
-                    box-shadow: 0 9px #bbb;
-                    border-radius: 10px;
-                }
-                .btn:hover{
-                    background-color: darkorange;
-                }
-        
-                .btn:active{
-                    background-color:darkorange;
-                    box-shadow: 0 3px #aaa;
-                    transform:translateY(4px);
-                }
-            </style>
+    
+    <div class="row">
+        <div class="col">
+        <!-- <h1>{{result}}</h1> -->
+        <a href="/"> 點選回到首頁 </a>
         <br>
-        <div class="mb-3">
-            <br>
-            <label for="exampleFormControlInput1" class="form-label"> 檢查選單順序 : <br>( 請按照 电子、真人、棋牌、彩票、捕鱼、体育、电竞、热门 針對各個項目想要的排序填入順序號 )<br>ex. 我想要 电子(3)在第三格/真人(1)在第一格/棋牌(2)在第二格/彩票(4)在第四格 以此類推，就填寫 31245678 </label>
-            <input type="text" class="form-control" id="exampleFormControlInput1" name="banner" placeholder="請輸入順序，以 SC-h5 默認順序來說（热门、电子、真人、棋牌、彩票、捕鱼、体育、电竞)，就是填寫 23456781。" required="required">
+        <h3> 以下為 YC https 批量開啟任務紀錄:</h3>
+        <div class="col">
+            {% for log in task %}
+          
+              <a> {{ log }} </a>
+              <br>
+          
+            {% endfor %}
         </div>
-        <div class="mb-3">
-            <label for="exampleFormControlTextarea1" class="form-label"> 統計碼供應商 : </label>
-            <select class="form-select" aria-label="Default select example" name="statistics" required>
-                <option value="0"> 無（不檢查統計碼） </option>
-                <option value="1"> 友盟cnzz </option>
-                <option value="2" disabled="disabled"> 百度 </option>
-                <option value="3" disabled="disabled"> Google </option>
-            </select>
         </div>
-        <div class="mb-3">
-            <br>
-            <label for="exampleFormControlTextarea1" class="form-label"> 域名＆邀請碼＆統計碼 : </label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" name="test" required="required" rows="20" placeholder="請輸入域名邀請碼統計碼格式請參照以下，中間為半形空格。
-            bill.com 1234 s4.cnzz.com:1281241590
-            bill.live 4321 s4.cnzz.com:1281241594
-            bill.cn 2222 v1.cnzz.com:1281241598"></textarea>
-        </div>
-        <!-- <textarea type="text" class="form-control" name="test" rows="20" cols="50" placeholder="請輸入域名邀請碼格式請參照以下，中間為半形空格。
-        bill.com 1234
-        bill.live 4321
-        bill.cn 2222">
-        </textarea> -->
-        <div style="text-align:center">
-            <button type="submit" class="btn btn-success" onclick="alert('資料載入時間較長，請稍等頁面跳轉。')" >Submit</button>
-        </div><br>
-        <div class="alert alert-danger" role="alert">
-            點選 Submit 後請稍待片刻，域名數量眾多需要些時間驗證，完成後頁面會跳轉至結果頁面。
-        </div>
-        <!-- <button type="submit" class="btn btn-primary" style="position: absolute; left: 500px; top: 20px">Submit</button> -->
-        <!-- <h2> 點選 Submit 後請稍待片刻，域名數量眾多需要些時間驗證，完成後頁面會跳轉至結果頁面。 </h2> -->
-        <!-- <input type="text" class="form-control" name="lastname" placeholder="Last name"> -->
     </div>
+  
 </body>
+  
+
+
