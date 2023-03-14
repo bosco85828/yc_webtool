@@ -139,7 +139,9 @@ def change_set(cusid,dlist,port,force=False):
         locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="switch"][1]//input[@name="IsHttps"]')
         ishttps=wait.until(EC.presence_of_element_located(locator))
         https_value=ishttps.get_attribute('value')
-        if not https_value:
+        
+        if not int(https_value):
+            print(123)
             locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="switch"][1]//span[2]')
             open_https=wait.until(EC.element_to_be_clickable(locator))
             # print(open_https.text)
