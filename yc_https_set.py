@@ -19,6 +19,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pytz
+from OpenSSL import crypto
 
 options = Options()
 options.add_argument("--disable-notifications")    
@@ -28,7 +30,7 @@ options.add_argument('--no-sandbox')
 options.add_argument('blink-settings=imagesEnabled=false')
 options.add_argument('--disable-dev-shm-usage')
 # options.add_argument("--headless") 
-
+now=datetime.now().strftime("%Y-%m-%d")
 
 def login(admin):
 
@@ -87,21 +89,42 @@ def login(admin):
     temp=wait.until(EC.element_to_be_clickable(locator))
     temp.click()
 
+def compare_cert(cert_data):
+
+    cert=crypto.load_certificate(crypto.FILETYPE_PEM,cert_data.encode())
+    not_before=datetime.strptime(cert.get_notBefore().decode(),'%Y%m%d%H%M%SZ')
+    tz=pytz.timezone('UTC')
+
+    now_time = datetime.now(tz)
+    now_time = now_time.replace(tzinfo=None)
+    print(now_time)
+    print(not_before)
+    
+    diff_day = (now_time-not_before).total_seconds()/86400
+
+    return diff_day
+
 def change_set(cusid,dlist,port,force=False):
     global log_list
     log_list=[]
     login(cusid)
+    print(dlist)
     for domain in dlist:
         data=get_ycssl(domain)
         cert=data['cert']
         key=data['key']
 
         if not cert:
-            log_list.append(str({domain:"Application for certificate failed."}))
+            log_list.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
+            continue
+        
+        if compare_cert(cert) > 7 : 
+            log_list.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
             continue
 
         locator=(By.XPATH,'//input[@name="Domain"]')
         temp=wait.until(EC.presence_of_element_located(locator))
+        temp.clear()
         temp.send_keys(domain)
 
         locator=(By.XPATH,'//button[@class="btn btn-default"][1]')
@@ -141,7 +164,7 @@ def change_set(cusid,dlist,port,force=False):
         https_value=ishttps.get_attribute('value')
         
         if not int(https_value):
-            print(123)
+            # print(123)
             locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="switch"][1]//span[2]')
             open_https=wait.until(EC.element_to_be_clickable(locator))
             # print(open_https.text)
@@ -177,7 +200,7 @@ def change_set(cusid,dlist,port,force=False):
         locator=(By.XPATH,'//input[@name="CertificatesName"]')
         cert_name=wait.until(EC.presence_of_element_located(locator))
         cert_name.clear()
-        cert_name.send_keys(domain)
+        cert_name.send_keys(now+"_"+domain)
 
         locator=(By.XPATH,'//textarea[@name="CertificatesContent"]')
         cert_content=wait.until(EC.presence_of_element_located(locator))
