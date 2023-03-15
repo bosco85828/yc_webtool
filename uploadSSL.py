@@ -5,12 +5,16 @@ import threading
 import cdnw_client
 import time
 from datetime import datetime,timezone,timedelta
-global AccessKey,SecretKey,host
+from OpenSSL import crypto
+import pytz
+
+global AccessKey,SecretKey,host,now
 AccessKey = 'qG3fh4K9ZFbapLm8ASHsdeyeAF9JmlFv6mbK'
 SecretKey = 'J6NZfEAVLKEZ4nDWyaSzpFFVYtYERVWSDQYayDNcW0l5uCwAJKEHVBYgLCas0cq6'
 host = 'api.cdnetworks.com'
-
+now=datetime.now().strftime("%Y-%m-%d")
 def get_yc_ssl(domain):
+    
     url="http://yc-api.cdnvips.net/Cdn/getCert"
     data={
         'domain':domain
@@ -21,10 +25,11 @@ def get_yc_ssl(domain):
     return result
 
 def upload_cdnw(cert_name,cert,key):
+    
     http_method = 'POST'
     uri='/api/certificate'
     post_request_body={
-        'name':cert_name,
+        'name':now+"_"+cert_name,
         'certificate':cert,
         'privateKey':key
     }
@@ -40,11 +45,24 @@ def check_cdnw_certid(cert_name):
     data=cdnw_client.send_request(AccessKey, SecretKey, host, uri, http_method, post_request_body)
     soup=BeautifulSoup(data.text,'xml')
     certs=soup.find_all('ssl-certificate')
-    cert=[ x for x in certs if x.find('name').get_text()==cert_name ]
+    cert=[ x for x in certs if x.find('name').get_text()==now+"_"+cert_name ]
     
     return cert[0].find('certificate-id').get_text()
     
+def compare_cert(cert_data):
+
+    cert=crypto.load_certificate(crypto.FILETYPE_PEM,cert_data.encode())
+    not_before=datetime.strptime(cert.get_notBefore().decode(),'%Y%m%d%H%M%SZ')
+    tz=pytz.timezone('UTC')
+
+    now_time = datetime.now(tz)
+    now_time = now_time.replace(tzinfo=None)
+    print(now_time)
+    print(not_before)
     
+    diff_day = (now_time-not_before).total_seconds()/86400
+
+    return diff_day
     
 
 
@@ -74,6 +92,10 @@ def main(input_domain):
         key=data['key']
 
         if cert and key : 
+            if compare_cert(cert) > 7 :
+                result_log.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
+                continue
+
             upload_result=upload_cdnw(domain,cert,key)
             if upload_result.status_code == 200 :
                 while True:
@@ -117,11 +139,16 @@ def main(input_domain):
 
 
 if __name__ == "__main__":
-    domain="test.bosco.live"
+    domain="m.bosco.live"
+    # domain="test.bosco.live"
     data=get_yc_ssl(domain)
     cert=data['cert']
     key=data['key']
-    print(upload_cdnw(domain,cert,key).text)
+    main(domain)
+    
+
+    
+
     # print(data)
     # print(bool(cert))
     # print(cert)
