@@ -139,12 +139,13 @@ def main(input_domain):
 
 
 if __name__ == "__main__":
-    domain="m.bosco.live"
+    domain="test.bosco.live"
     # domain="test.bosco.live"
     data=get_yc_ssl(domain)
     cert=data['cert']
     key=data['key']
-    main(domain)
+    print(cert)
+    print(compare_cert(cert))
     
 
     

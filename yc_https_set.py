@@ -118,9 +118,25 @@ def change_set(cusid,dlist,port,force=False):
             log_list.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
             continue
         
-        if compare_cert(cert) > 7 : 
-            log_list.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
-            continue
+        if  compare_cert(cert) > 7: 
+            count=0
+            while count < 2  : 
+                data=get_ycssl(domain)
+                cert=data['cert']
+                key=data['key']
+                
+                if compare_cert(cert) < 1 :
+                    break
+
+                else : 
+                    count += 1 
+                    continue 
+            
+            else : 
+                log_list.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
+                continue
+        
+
 
         locator=(By.XPATH,'//input[@name="Domain"]')
         temp=wait.until(EC.presence_of_element_located(locator))

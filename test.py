@@ -1,58 +1,39 @@
-from OpenSSL import crypto 
+import socket
 from datetime import datetime,timezone,timedelta
-import pytz
-import requests 
-import pydig
-import os 
+import requests
+from selenium.common.exceptions import NoSuchElementException,TimeoutException
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
+import time
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import json
+
+options = Options()
+options.add_argument("--disable-notifications")    
+options.add_argument("--headless")
+options.add_argument('--disable-gpu')
+options.add_argument('--no-sandbox')
+options.add_argument('blink-settings=imagesEnabled=false')
+options.add_argument('--disable-dev-shm-usage')
+
+s=Service(ChromeDriverManager().install())
+global browser
+browser = webdriver.Chrome(service=s, options=options)
+browser.get("http://yc-api.cdnvips.net/Cdn/getYcDomain")
+global wait
+wait=WebDriverWait(browser,10)
+
+locator=(By.XPATH,'//body')
+body=wait.until(EC.presence_of_element_located(locator))
+data=body.text
+
+data=data.strip('[]')
+print(type(json.loads(data)))
 
 
-
-
-
-def get_yc_ssl(domain):
-    url="http://yc-api.cdnvips.net/Cdn/getCert"
-    data={
-        'domain':domain
-    }
-
-    result=requests.post(url,data=data).json()
-
-    return result
-
-def compare_cert(cert_data):
-
-    cert=crypto.load_certificate(crypto.FILETYPE_PEM,cert_data.encode())
-    not_before=datetime.strptime(cert.get_notBefore().decode(),'%Y%m%d%H%M%SZ')
-    tz=pytz.timezone('UTC')
-
-    now=datetime.now(tz)
-    now = now.replace(tzinfo=None)
-    
-
-
-    print(now)
-    print(not_before)
-    
-
-    diff_day = (now-not_before).total_seconds()/86400
-
-    return diff_day
-
-
-# cert=get_yc_ssl('m.bosco.live')['cert']
-# print(cert)
-
-
-# print(compare_cert(cert))
-domain="m.bosco.live"
-
-resolver=pydig.Resolver(
-    executable='/usr/bin/dig',
-    nameservers=["8.8.8.8",],
-    additional_args=['+time=3',]
-)
-
-
-data = pydig.query('m.bosco.live','CNAME')
-data=pydig.query(data[0],'CNAME')
-print(data)
