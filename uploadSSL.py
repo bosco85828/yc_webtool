@@ -93,8 +93,25 @@ def main(input_domain):
 
         if cert and key : 
             if compare_cert(cert) > 7 :
-                result_log.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
-                continue
+                count=0
+                while count < 2  : 
+                    data=get_yc_ssl(domain)
+                    cert=data['cert']
+                    key=data['key']
+                    
+                    if compare_cert(cert) < 1 :
+                        break
+
+                    else : 
+                        count += 1 
+                        continue 
+                
+                else : 
+                    result_log.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
+                    continue
+
+                # result_log.append(str({domain:"Application for a new certificate failed. Please check if you are pointing correctly."}))
+                # continue
 
             upload_result=upload_cdnw(domain,cert,key)
             if upload_result.status_code == 200 :
