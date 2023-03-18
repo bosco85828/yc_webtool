@@ -4,10 +4,20 @@ from aliyunsdkcore.acs_exception.exceptions import ClientException
 from aliyunsdkcore.acs_exception.exceptions import ServerException
 from aliyunsdkalidns.request.v20150109.AddDomainRecordRequest import AddDomainRecordRequest
 from aliyunsdkalidns.request.v20150109.AddDomainRequest import AddDomainRequest
+from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
+from aliyunsdkalidns.request.v20150109.UpdateDomainRecordRequest import UpdateDomainRecordRequest
+import json
 from datetime import datetime,timezone,timedelta
+from dotenv import load_dotenv
+import os 
+
+load_dotenv()
+ALI_SC_ID=os.getenv('ALI_SC_ID')
+ALI_SC_SECRET=os.getenv('ALI_SC_SECRET')
+
 global customer
 customer={
-    'sc':{'id':'LTAI5tLLhoNFCreJ81jGFAnw','secret':'OweIwUzXup2251GHusrQLdBPPIKvqV'}
+    'sc':{'id':ALI_SC_ID,'secret':ALI_SC_SECRET}
 }
 
 def add_domain(c_name,dlist):
@@ -64,6 +74,49 @@ def add_record(c_name,root,host,type,value):
     result=client.do_action_with_exception(request_)
     return str(result, encoding='utf-8')
 
+def get_domain_record(c_name,root,host=None):
+    client = AcsClient(
+        customer[c_name]['id'],
+        customer[c_name]['secret'],
+        'cn-shenzhen'
+    )
+
+    request_=DescribeDomainRecordsRequest()
+    request_.set_accept_format('json')
+    request_.set_DomainName(root)
+    request_.set_PageSize(500)
+    if host:
+        request_.set_RRKeyWord(host)
+
+    result=client.do_action_with_exception(request_)
+    return json.loads(str(result,encoding='utf-8'))
+    # return json.loads(result)
+
+
+def change_domain_record(c_name,record_id,host,type_,value):
+    client = AcsClient(
+        customer[c_name]['id'],
+        customer[c_name]['secret'],
+        'cn-shenzhen'
+    )
+
+    request_=UpdateDomainRecordRequest()
+    request_.set_RecordId(record_id)
+    request_.set_RR(host)
+    request_.set_Type(type_)
+    request_.set_Value(value)
+
+    result=client.do_action_with_exception(request_)
+    return json.loads(str(result,encoding='utf-8')) 
+
 if __name__ == "__main__":
-    input_domain=['bosco.com','bill2.com','bill3.com']
-    print(add_domain('sc',input_domain))
+    input_domain=['bosco.com']
+    # print(add_domain('sc',input_domain))
+    records=get_domain_record('sc','bosco.com','www')['DomainRecords']['Record']
+    for record in records : 
+        if record['RR'] == "www" : 
+            record_id = record['RecordId']
+    
+    print(record_id)
+
+    print(change_domain_record('sc',record_id,'www','CNAME','bosco.live'))

@@ -1,2 +1,4 @@
+cdnw_ssl.sh
 *.log
+.env
 **/__pycache__/

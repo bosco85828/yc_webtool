@@ -7,10 +7,13 @@ import time
 from datetime import datetime,timezone,timedelta
 from OpenSSL import crypto
 import pytz
+from dotenv import load_dotenv
+import os 
 
+load_dotenv()
 global AccessKey,SecretKey,host,now
-AccessKey = 'qG3fh4K9ZFbapLm8ASHsdeyeAF9JmlFv6mbK'
-SecretKey = 'J6NZfEAVLKEZ4nDWyaSzpFFVYtYERVWSDQYayDNcW0l5uCwAJKEHVBYgLCas0cq6'
+AccessKey = os.getenv('CDNW_ACCESSKEY')
+SecretKey = os.getenv('CDNW_SECRETKEY')
 host = 'api.cdnetworks.com'
 now=datetime.now().strftime("%Y-%m-%d")
 def get_yc_ssl(domain):
@@ -156,13 +159,14 @@ def main(input_domain):
 
 
 if __name__ == "__main__":
-    domain="test.bosco.live"
+    print(AccessKey,SecretKey)
     # domain="test.bosco.live"
-    data=get_yc_ssl(domain)
-    cert=data['cert']
-    key=data['key']
-    print(cert)
-    print(compare_cert(cert))
+    # # domain="test.bosco.live"
+    # data=get_yc_ssl(domain)
+    # cert=data['cert']
+    # key=data['key']
+    # print(cert)
+    # print(compare_cert(cert))
     
 
     

@@ -1,6 +1,12 @@
 import requests
 from datetime import datetime,timezone,timedelta
 import re
+from dotenv import load_dotenv
+import os 
+
+load_dotenv()
+SC_WHITE_NAME=os.getenv('SC_WHITE_NAME')
+SC_WHITE_PASSWORD=os.getenv('SC_WHITE_PASSWORD')
 
 
 def get_token():
@@ -14,8 +20,8 @@ def get_token():
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'        
     }
     data={
-        'signName':'luke123',
-        'signPassword':'luke123123'
+        'signName':SC_WHITE_NAME,
+        'signPassword':SC_WHITE_PASSWORD
     }
 
     result=requests.post(url,headers=header,json=data).json()
@@ -216,13 +222,14 @@ def main(input_dcodelist,input_order,statistics,merchant):
 
 
 if __name__ == "__main__":
+    print(SC_WHITE_NAME)
+    print(SC_WHITE_PASSWORD)
+    # token=get_token()
 
-    token=get_token()
+    # input_="""bill225.com 11111 s9.cnzz.com:1281219776
+    # bill225.live 22222 s4.cnzz.com:1281219778
+    # bill225.cc 33333  v1.cnzz.com:1281216154"""
 
-    input_="""bill225.com 11111 s9.cnzz.com:1281219776
-    bill225.live 22222 s4.cnzz.com:1281219778
-    bill225.cc 33333  v1.cnzz.com:1281216154"""
+    # input_order="87563412"
 
-    input_order="87563412"
-
-    main(input_,input_order,statistics=0,merchant="YCTEST")
+    # main(input_,input_order,statistics=0,merchant="YCTEST")

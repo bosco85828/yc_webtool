@@ -18,6 +18,11 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
+import os 
+
+load_dotenv()
+YC_PASSWORD=os.getenv('YC_PASSWORD')
 
 options = Options()
 options.add_argument("--disable-notifications")    
@@ -47,7 +52,7 @@ def login(admin):
     password=wait.until(EC.presence_of_element_located(locator))
     
     acount.send_keys('bill')
-    password.send_keys('1qaz@WSXbill')
+    password.send_keys(YC_PASSWORD)
 
     locator=(By.ID,"btnSumbit")
     submit=wait.until(EC.element_to_be_clickable(locator))
