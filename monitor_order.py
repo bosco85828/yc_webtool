@@ -100,10 +100,11 @@ def login(domain,right_code,browser):
 
 def compare_banner(banner):
     banner_list=["electronic","live","qpgame","cpgame","hunter","sports","esports","hotgame"]
+    global banner_result
     banner_result=[ (int(order[x])-1,banner_list[x]) for x in range(len(order))]
     banner_result.sort(key=lambda x : x[0])
     # print(order)
-    # print(banner_result)
+    print(banner_result)
     # banner_list=list(enumerate(["electronic","live","qpgame","cpgame","hunter","sports","esports"]))
     
     for index,value in banner_result:
@@ -206,6 +207,7 @@ def main(input_,qlist,input_order,statistics):
     print(wrong_domain)
     print("\n")
     browser.quit()
+    qlist.put(banner_result)
     qlist.put(len(correct_domain))
     qlist.put(wrong_domain)
     return wrong_domain

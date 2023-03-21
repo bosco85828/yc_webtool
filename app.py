@@ -247,12 +247,14 @@ def submit():
     t.start()
     # lock.acquire()
     t.join()
+    check_banner_order=qlist.get()
     correct_count=qlist.get()
     temp_1 = qlist.get()
     # print(temp_1)
     temp_2=[(x.split('>')) for x in temp_1]
     result={ x:y for x,y in temp_2}
     # lock.release()
+    print(check_banner_order)
     print(result)
     print(correct_count)
     return render_template('submit.html',**locals())
