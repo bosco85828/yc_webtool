@@ -126,9 +126,12 @@ def add_order(token,dlist,order,merchantId=1):
     result=requests.post(url,headers=header,json=data).json()
     return result
 
-def add_statistics(domain,merchant,cnzz_code="",google_code="",baidu_code=""):
-
-    url="http://api.modmojo.com/addScRec.php"
+def add_statistics(domain,merchant,merchantId=1,cnzz_code="",google_code="",baidu_code=""):
+    
+    if str(merchantId) == "1":  
+        url="http://api.modmojo.com/addScRec.php"
+    elif str(merchantId) == "3":
+        url="http://api2.modmojo.com/addScRec.php"
 
     data={
         'domain':domain,
@@ -191,21 +194,24 @@ def main(input_dcodelist,input_order,statistics,merchant,domain_merchant):
         except: statistics_list = None 
         result=[]
         result.append(str({"add_white":add_white(token,domainlist,merchantId=domain_merchant,all_domain=check_white(token))}))
-        result.append(str({"add_order":add_order(token,domainlist,input_order,domain_merchant)}))
+        
+        if str(domain_merchant) != "3" :
+            result.append(str({"add_order":add_order(token,domainlist,input_order,domain_merchant)}))
+
         result.append(str({"add_invitation_code":add_code(token,dcodelist,domain_merchant)}))
         
         if statistics_list:
             if str(statistics) == "0" :
                 for domain,cn_code in statistics_list : 
-                    result.append(str({domain:add_statistics(domain,merchant,cnzz_code=cn_code)}))
+                    result.append(str({domain:add_statistics(domain,merchant,merchantId=domain_merchant,cnzz_code=cn_code)}))
 
             elif str(statistics) == "2" :
                 for domain,gg_code in statistics_list : 
-                    result.append(str({domain:add_statistics(domain,merchant,google_code=gg_code)}))
+                    result.append(str({domain:add_statistics(domain,merchant,merchantId=domain_merchant,google_code=gg_code)}))
             
             elif str(statistics) == "1" :
                 for domain,bd_code in statistics_list : 
-                    result.append(str({domain:add_statistics(domain,merchant,baidu_code=bd_code)}))
+                    result.append(str({domain:add_statistics(domain,merchant,merchantId=domain_merchant,baidu_code=bd_code)}))
         else : 
             result.append("{Error:statistics_list Failed to add statistics_code, because format error.}")
 
@@ -214,6 +220,7 @@ def main(input_dcodelist,input_order,statistics,merchant,domain_merchant):
         old_content=f.read()
         f.seek(0)
         f.write(f"\n{now_time}\n")
+        f.write(f"\n{domainlist}\n")
         f.writelines("\n".join(result))
         f.write("\n"+old_content)
         
