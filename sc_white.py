@@ -29,6 +29,7 @@ def get_token():
     return result['data']['token']
 
 
+# merchantID 1="196TY" 2="KK體育" 3="T體育"
 def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None):
     domain_list = list(set(dlist) - all_domain)
     domain_str=",".join(domain_list)
@@ -59,6 +60,7 @@ def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None)
 
     return result
 
+# merchantID 1="196TY" 2="KK體育" 3="T體育"
 def add_code(token,dcodelist,merchantId=1):
 
     final_dcode=[ {'domain':x[0],'correspondData':x[1]} for x in dcodelist]
@@ -171,7 +173,7 @@ def check_white(token):
     domain_list=[ x['domain'] for x in result['data']['dataList'] if x ]
     return set(domain_list)
 
-def main(input_dcodelist,input_order,statistics,merchant):
+def main(input_dcodelist,input_order,statistics,merchant,domain_merchant):
     try : 
         testfile = open("scwhite.log","r+")
         testfile.close()
@@ -188,9 +190,9 @@ def main(input_dcodelist,input_order,statistics,merchant):
         try:statistics_list=[(x[0],x[2]) for x in dcodelist if x]
         except: statistics_list = None 
         result=[]
-        result.append(str({"add_white":add_white(token,domainlist,all_domain=check_white(token))}))
-        result.append(str({"add_order":add_order(token,domainlist,input_order)}))
-        result.append(str({"add_statistics_code":add_code(token,dcodelist)}))
+        result.append(str({"add_white":add_white(token,domainlist,merchantId=domain_merchant,all_domain=check_white(token))}))
+        result.append(str({"add_order":add_order(token,domainlist,input_order,domain_merchant)}))
+        result.append(str({"add_invitation_code":add_code(token,dcodelist,domain_merchant)}))
         
         if statistics_list:
             if str(statistics) == "0" :

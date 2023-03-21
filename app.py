@@ -162,12 +162,13 @@ def scwhite_completed():
     input_order=request.values['data_order']
     input_statistics=request.values['statistics']
     input_merchant=request.values['merchant']
+    input_domain_merchant=request.values['domain_merchant']
     # print(input_dcodelist)
     # print(input_order)
     # print(input_statistics)
     # print(input_merchant)
 
-    t1=threading.Thread(target=sc_white.main,args=(input_dcodelist,input_order,input_statistics,input_merchant))
+    t1=threading.Thread(target=sc_white.main,args=(input_dcodelist,input_order,input_statistics,input_merchant,input_domain_merchant))
     t1.start()
 
 
