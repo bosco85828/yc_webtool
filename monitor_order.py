@@ -52,33 +52,35 @@ def compare_cnzz(domain):
 
 
 def login(domain,right_code,browser):
-    try : browser.get(f"https://{domain}/")
-    except WebDriverException : 
-        wrong_domain.append(f"{domain}>Please check domain SSL.")
-        # print("Please check domain SSL.")
-        return f"{domain}: Please check domain SSL."
-    # try:temp=browser.find_element(By.XPATH,'//div[@class="close-button"][1]')
-    # except NoSuchElementException:
-    #     wrong_domain.append(f"{domain}>can't access")
-    #     return f"{domain} can't access."
-    # except : 
-    #     wrong_domain.append(f"{domain}>something wrong")
-    #     return f"{domain}, something wrong."
-    
-    locator=(By.XPATH,'//div[@class="close-button"][1]')
-    search_close= WebDriverWait(browser,10).until(EC.element_to_be_clickable(locator),"訪問出現異常")
-    # print(search_close)
-    search_close.click()
-    time.sleep(3)
-    locator=(By.XPATH,'//div[@class="class-block-selector"]/div')
-    temp=WebDriverWait(browser,10).until(EC.presence_of_all_elements_located(locator))
-    # print([ x.get_attribute('class') for x in temp ])
-    banner=browser.find_elements(By.XPATH,'//div[@class="class-block-selector"]/div')
-    compare_result=compare_banner(banner)
-    
-    if compare_result != "Success" : 
-        wrong_domain.append(f"{domain}>{compare_result}, Now:{now_banner}.")
-        return f"{domain}, {compare_result}, Now:{now_banner}."
+
+    if str(merchant_id) == "0":
+        try : browser.get(f"https://{domain}/")
+        except WebDriverException : 
+            wrong_domain.append(f"{domain}>Please check domain SSL.")
+            # print("Please check domain SSL.")
+            return f"{domain}: Please check domain SSL."
+        # try:temp=browser.find_element(By.XPATH,'//div[@class="close-button"][1]')
+        # except NoSuchElementException:
+        #     wrong_domain.append(f"{domain}>can't access")
+        #     return f"{domain} can't access."
+        # except : 
+        #     wrong_domain.append(f"{domain}>something wrong")
+        #     return f"{domain}, something wrong."
+        
+        locator=(By.XPATH,'//div[@class="close-button"][1]')
+        search_close= WebDriverWait(browser,10).until(EC.element_to_be_clickable(locator),"訪問出現異常")
+        # print(search_close)
+        search_close.click()
+        time.sleep(3)
+        locator=(By.XPATH,'//div[@class="class-block-selector"]/div')
+        temp=WebDriverWait(browser,10).until(EC.presence_of_all_elements_located(locator))
+        # print([ x.get_attribute('class') for x in temp ])
+        banner=browser.find_elements(By.XPATH,'//div[@class="class-block-selector"]/div')
+        compare_result=compare_banner(banner)
+        
+        if compare_result != "Success" : 
+            wrong_domain.append(f"{domain}>{compare_result}, Now:{now_banner}.")
+            return f"{domain}, {compare_result}, Now:{now_banner}."
 
     # temp=browser.find_element(By.XPATH,'//div[@class="login-wrapper"]/img[2]')
     # locator=(By.XPATH,'//div[@class="login-wrapper"]/img[1]')
@@ -118,7 +120,10 @@ def compare_banner(banner):
     else : return "Success"
 
 
-def main(input_,qlist,input_order,statistics):
+def main(input_,qlist,input_order,statistics,merchant):
+    global merchant_id
+    merchant_id=merchant
+
     global correct_domain
     correct_domain=[]
     
@@ -207,7 +212,11 @@ def main(input_,qlist,input_order,statistics):
     print(wrong_domain)
     print("\n")
     browser.quit()
-    qlist.put(banner_result)
+    
+    try: 
+        qlist.put(banner_result)
+    except: pass 
+    
     qlist.put(len(correct_domain))
     qlist.put(wrong_domain)
     return wrong_domain
