@@ -177,7 +177,7 @@ def add_domain(cusID,domainlist,request_port,origin_addr,origin_port,type,redire
                 login(cusID)
                 # f.write("{}\n".format({f"{domain}":"Something wrong, please try again."}))
 
-        time.sleep(5)
+        time.sleep(10)
     else: browser.quit()
     now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
     with open("ycadd.log","r+") as f :
