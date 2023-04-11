@@ -12,6 +12,7 @@ import uploadSSL
 import alidns_set
 import yc_https_set
 from datetime import datetime
+import sync_config
 
 app = Flask(__name__)
 qlist=Queue()
@@ -47,9 +48,65 @@ def form():
 
 
 
+@app.route("/DeleteCdnw")
+def delete_cdnw():
+    return render_template('delete_cdnw.html')
+
+@app.route("/DeleteCdnwCompleted",methods=['POST'])
+def delete_cdnw_completed():
+    input_domain=request.values['domain']
+    domainlist=re.findall(r'[a-zA-Z.:0-9-]+',input_domain)
+
+    t1=threading.Thread(target=sync_config.delete_domain,args=(domainlist,))
+    t1.start()
+
+    return render_template('delete_cdnw_completed.html',**locals())
+
+@app.route("/DeleteCdnwLog")
+def check_delete_cdnw_log():
+    try :
+        with open('delete_cdnw.log') as f :
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
+
+    return render_template('check_delete_cdnw_log.html',**locals())
+
+@app.route("/SyncCdnw")
+def sync_cdnw_config():
+    return render_template('sync_cdnw_config.html')
+
+@app.route("/SyncCdnwCompleted",methods=['POST'])
+def sync_cdnw_config_completed():
+    input_domain=request.values['domain']
+    try : input_refer=request.values['refer']
+    except : 
+        input_refer = None
+
+    domainlist=re.findall(r'[a-zA-Z.:0-9-]+',input_domain)
+
+    t1=threading.Thread(target=sync_config.main,args=(domainlist,input_refer))
+    t1.start()
+
+    return render_template('sync_cdnw_config_completed.html',**locals())
+
+@app.route("/CheckSyncCdnwLog")
+def check_sync_cdnw_log():
+    try :
+        with open('sync_cdnw.log') as f :
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
+
+    return render_template('check_sync_cdnw_log.html',**locals())
+
+
 @app.route("/ycopenhttps")
 def yc_openhttps():
-    return render_template('yc_openhttps.html')
+    # return render_template('yc_openhttps.html')
+    return "功能暫未開放" , 404
 
 @app.route("/ycopenhttpscompleted",methods=['POST'])
 def yc_openhttps_completed():
@@ -79,7 +136,8 @@ def check_yc_https():
 
 @app.route("/ycadd")
 def ycadd():
-    return render_template('yc_add.html')
+    # return render_template('yc_add.html')
+    return "功能暫未開放" , 404
 
 @app.route("/scwhite")
 def scwhite():
@@ -238,7 +296,10 @@ def check_alidns_adddomainlog():
 @app.route("/submit",methods=['POST'])
 def submit():
     domain = request.values['test']
-    banner = request.values['banner']
+    
+    try : banner = request.values['banner']
+    except : banner = None
+
     statistics = request.values['statistics']
     merchant = request.values['merchant']
     # print(threading.active_count())
@@ -248,20 +309,21 @@ def submit():
     t.start()
     # lock.acquire()
     t.join()
+    print("merchant:" + str(merchant))
     if str(merchant) == "0":
         check_banner_order=qlist.get()
-        print(check_banner_order)
+        print("check: "+ str(check_banner_order))
 
     correct_count=qlist.get()
     temp_1 = qlist.get()
-    
-    print(temp_1)
+    print("correct_count:" + str(correct_count))
+    print("temp:" + str(temp_1))
     temp_2=[(x.split('>')) for x in temp_1]
     result={ x:y for x,y in temp_2}
     # lock.release()
     
     print(result)
-    print(correct_count)
+
     return render_template('submit.html',**locals())
     
 

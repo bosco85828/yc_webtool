@@ -52,6 +52,8 @@
                     CDNW
                     </a>
                     <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/SyncCdnw"> 參考 YCCDN 配置批量建立 </a></li>
+                    <li><a class="dropdown-item" href="/DeleteCdnw"> 刪除域名 </a></li>
                     <li><a class="dropdown-item" href="/cdnwuploadssl"> 批量上傳證書 </a></li>
                     <!-- <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="#">Something else here</a></li> -->
@@ -103,16 +105,16 @@
         <br>
         <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label"> 域名商戶種類 : </label>
-            <select class="form-select" aria-label="Default select example" name="merchant" required>
+            <select class="form-select" aria-label="Default select example" name="merchant" id="select_main" required>
                 <option value="0"> 196體育 </option>
                 <option value="1"> T體育 </option>
             </select>
         </div>
         <br>
-        <div class="mb-3">
+        <div class="mb-3" id="select_sub" >
             <br>
             <label for="exampleFormControlInput1" class="form-label"> 檢查選單順序 : <br>( 請按照 电子、真人、棋牌、彩票、捕鱼、体育、电竞、热门 針對各個項目想要的排序填入順序號 )<br>ex. 我想要 电子(3)在第三格/真人(1)在第一格/棋牌(2)在第二格/彩票(4)在第四格 以此類推，就填寫 31245678 <br> 如果是T體育域名隨便輸入即可。</label>
-            <input type="text" class="form-control" id="exampleFormControlInput1" name="banner" placeholder="請輸入順序，以 SC-h5 默認順序來說（热门、电子、真人、棋牌、彩票、捕鱼、体育、电竞)，就是填寫 23456781。" required="required">
+            <input type="text" class="form-control" id="exampleFormControlInput1" name="banner" placeholder="請輸入順序，以 SC-h5 默認順序來說（热门、电子、真人、棋牌、彩票、捕鱼、体育、电竞)，就是填寫 23456781。" >
         </div>
         <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label"> 統計碼供應商 : </label>
@@ -131,19 +133,23 @@
             bill.live 4321 s4.cnzz.com:1281241594
             bill.cn 2222 v1.cnzz.com:1281241598"></textarea>
         </div>
-        <!-- <textarea type="text" class="form-control" name="test" rows="20" cols="50" placeholder="請輸入域名邀請碼格式請參照以下，中間為半形空格。
-        bill.com 1234
-        bill.live 4321
-        bill.cn 2222">
-        </textarea> -->
         <div style="text-align:center">
             <button type="submit" class="btn btn-success" onclick="alert('資料載入時間較長，請稍等頁面跳轉。')" >Submit</button>
         </div><br>
         <div class="alert alert-danger" role="alert">
             點選 Submit 後請稍待片刻，域名數量眾多需要些時間驗證，完成後頁面會跳轉至結果頁面。
         </div>
-        <!-- <button type="submit" class="btn btn-primary" style="position: absolute; left: 500px; top: 20px">Submit</button> -->
-        <!-- <h2> 點選 Submit 後請稍待片刻，域名數量眾多需要些時間驗證，完成後頁面會跳轉至結果頁面。 </h2> -->
-        <!-- <input type="text" class="form-control" name="lastname" placeholder="Last name"> -->
+
     </div>
+    <script>
+        document.getElementById('select_main').onchange=function(){
+            var select_sub=document.getElementById('select_sub');
+            select_sub.style.display='none';
+            if(this.value=='0'){
+                select_sub.style.display='inline-block';
+            }
+        };
+    </script>
+
 </body>
+

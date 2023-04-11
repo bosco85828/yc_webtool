@@ -76,23 +76,58 @@
 </head>
 
 <body>
-    
-    <div class="row">
-        <div class="col">
-        <!-- <h1>{{result}}</h1> -->
-        <a href="/"> 點選回到首頁 </a>
+<form method="POST" action="{{url_for('sync_cdnw_config_completed')}}">
+    <meta charset="utf-8">
+    <style type="text/css">
+        .btn{
+            background-color:orange;
+            border: none;
+            font-size: 20px;
+            font-weight: normal;
+            color: #0c3e29;
+            outline:none;
+            cursor:pointer;
+            padding: 15px 25px ;
+            box-shadow: 0 9px #bbb;
+            border-radius: 10px;
+        }
+        .btn:hover{
+            background-color: darkorange;
+        }
+
+        .btn:active{
+            background-color:darkorange;
+            box-shadow: 0 3px #aaa;
+            transform:translateY(4px);
+        }
+    </style>
+    <div class="container">    
+        <br>   
+        <div style="text-align:center">
+            <h2> 批量將 YCCDN 上域名設定同步至 CDNW 上建立域名 </h2>  
+        </div>     
         <br>
-        <h3> 以下為前次 SC 域名 加白/邀請碼/統計碼 任務紀錄:</h3>
-        <div class="col">
-            {% for log in task %}
-          
-              <a> {{ log }} </a>
-              <br>
-          
-            {% endfor %}
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label"> 域名 : </label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" name="domain" required="required" rows="10" placeholder="請輸入 CDNW 需上傳證書之域名清單，並確認域名已經指向 YCCDN，多個域名可用換行或者,隔開。
+            bill.com
+            bosco.live
+            bill.cc"></textarea>
         </div>
+        <br>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label"> 參照域名(可空白) : </label>
+            <input type="text" class="form-control" id="exampleFormControlInput4" name="refer">
         </div>
+        <br>
+        <div style="text-align:center">
+            <button type="submit" class="btn btn-success" >Submit</button>
+        </div>
+        <!-- <div style = "margin:3em;" > 
+            <button type="submit" class="btn btn-primary btn-lg" id="load2" data-loading-text="<i class = 'fa fa-spinner fa-spin ' ></i>  Processing Order">Submit</button> 
+        </div> -->
     </div>
-  
+</form>
+
 </body>
-  
+

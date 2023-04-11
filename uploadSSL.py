@@ -159,7 +159,7 @@ def main(input_domain):
 
 
 if __name__ == "__main__":
-    print(AccessKey,SecretKey)
+    print(main('m.bosco.live'))
     # domain="test.bosco.live"
     # # domain="test.bosco.live"
     # data=get_yc_ssl(domain)
