@@ -93,6 +93,9 @@ def add_domain(domain,origin_protocol='http',refer=None):
         'referenced-domain-name':refer,
         'origin-config':{
             'origin-ips':origin,
+        },
+        "ssl":{
+             "use-ssl":False,
         }
     }
     
