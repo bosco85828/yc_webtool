@@ -105,8 +105,8 @@ def check_sync_cdnw_log():
 
 @app.route("/ycopenhttps")
 def yc_openhttps():
-    # return render_template('yc_openhttps.html')
-    return "功能暫未開放" , 404
+    return render_template('yc_openhttps.html')
+    # return "功能暫未開放" , 404
 
 @app.route("/ycopenhttpscompleted",methods=['POST'])
 def yc_openhttps_completed():
@@ -136,8 +136,8 @@ def check_yc_https():
 
 @app.route("/ycadd")
 def ycadd():
-    # return render_template('yc_add.html')
-    return "功能暫未開放" , 404
+    return render_template('yc_add.html')
+    # return "功能暫未開放" , 404
 
 @app.route("/scwhite")
 def scwhite():
