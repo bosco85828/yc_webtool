@@ -13,6 +13,7 @@ import alidns_set
 import yc_https_set
 from datetime import datetime
 import sync_config
+import new_cnzz
 
 app = Flask(__name__)
 qlist=Queue()
@@ -150,6 +151,21 @@ def cdnwuploadssl():
 @app.route("/searchcnzz")
 def searchcnzz():
     return render_template('searchcnzz.html')
+
+@app.route("/checkcnzz")
+def checkcnzz():
+    return render_template('checkcnzz.html')
+
+@app.route("/checkCnzzCompleted",methods=['POST'])
+def checkcnzz_completed():
+    input_domain=request.values['test']
+    dlist=re.findall(r'[0-9a-zA-Z:.-]+',input_domain)
+    result=[]
+    for domain in dlist : 
+        result.append(str(new_cnzz.compare_cnzz(domain)))
+
+    return render_template('checkcnzz_completed.html',**locals())
+
 
 @app.route("/createcnzz")
 def createcnzz():
