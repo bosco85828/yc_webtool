@@ -130,8 +130,10 @@ def change_set(cusid,dlist,port,force=False):
         tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
         # print(tr_list)
         index=1
+        page=1
         
         domain_list=[]
+        current_url = browser.current_url
         while True :
             
             # locator=(By.XPATH,f'//table[@id="CdnInfoTable"]/tbody[1]/tr[{index}]//a[@class="btn-primary"]')
@@ -139,10 +141,17 @@ def change_set(cusid,dlist,port,force=False):
             try : domain_info=wait.until(EC.element_to_be_clickable(locator)).click()
             except TimeoutException as err: 
                 print('next_page')
-                locator=(By.XPATH,'//li[@class="paginate_button next  "]/a')
-                try : next_page=wait.until(EC.element_to_be_clickable(locator)).click()
-                except TimeoutException as err:
+                page+=1
+                browser.get(current_url + f"?PageIndex={page}")
+                tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
+
+                if len(tr_list) == 0 :
                     break
+
+                # locator=(By.XPATH,'//li[@class="paginate_button next  "]/a')
+                # try : next_page=wait.until(EC.element_to_be_clickable(locator)).click()
+                # except TimeoutException as err:
+                #     break
                 index=1
                 continue
 
@@ -163,8 +172,9 @@ def change_set(cusid,dlist,port,force=False):
                 'origin_port':domain_origin_port
             }
             
-            locator=(By.XPATH,'//div[@class="callout-link"]//a[2]')
-            previous=wait.until(EC.element_to_be_clickable(locator)).click()
+            # locator=(By.XPATH,'//div[@class="callout-link"]//a[2]')
+            # previous=wait.until(EC.element_to_be_clickable(locator)).click()
+            browser.get(current_url + f"?PageIndex={page}")
             index+=2
             domain_list.append(domain_dict)
         print(domain_list[0:2])
