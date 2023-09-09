@@ -162,7 +162,7 @@ def change_set(cusid,dlist,port,force=False):
             domain_cname=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
             locator=(By.XPATH,'//div[@class="form-group"][4]//input')
             domain_origin=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
-            locator=(By.XPATH,'//div[@class="form-group"][6]//input')
+            locator=(By.XPATH,'//div[@class="form-group"][6]//input[@id="SourcePort"]')
             domain_origin_port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
     
             domain_dict={
@@ -171,6 +171,7 @@ def change_set(cusid,dlist,port,force=False):
                 'origin':domain_origin,
                 'origin_port':domain_origin_port
             }
+            print(domain_dict)
             
             # locator=(By.XPATH,'//div[@class="callout-link"]//a[2]')
             # previous=wait.until(EC.element_to_be_clickable(locator)).click()
