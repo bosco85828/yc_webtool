@@ -23,6 +23,7 @@ import pytz
 from OpenSSL import crypto
 from dotenv import load_dotenv
 import os 
+import json
 
 load_dotenv()
 YC_PASSWORD=os.getenv('YC_PASSWORD')
@@ -37,7 +38,7 @@ options.add_argument('blink-settings=imagesEnabled=false')
 options.add_argument('--disable-dev-shm-usage')
 # options.add_argument("--headless") 
 now=datetime.now().strftime("%Y-%m-%d")
-
+path=os.getcwd()
 def login(admin):
 
     s=Service()
@@ -95,199 +96,71 @@ def login(admin):
     temp=wait.until(EC.element_to_be_clickable(locator))
     temp.click()
 
-def compare_cert(cert_data):
 
-    cert=crypto.load_certificate(crypto.FILETYPE_PEM,cert_data.encode())
-    not_before=datetime.strptime(cert.get_notBefore().decode(),'%Y%m%d%H%M%SZ')
-    tz=pytz.timezone('UTC')
-
-    now_time = datetime.now(tz)
-    now_time = now_time.replace(tzinfo=None)
-    print(now_time)
-    print(not_before)
-    
-    diff_day = (now_time-not_before).total_seconds()/86400
-
-    return diff_day
-
-def change_set(cusid,dlist,port,force=False):
+def get_domains(cusid,file_name):
     global log_list
     log_list=[]
     login(cusid)
-    print(dlist)
-    for domain in dlist:
-        
 
-        # locator=(By.XPATH,'//input[@name="Domain"]')
-        # temp=wait.until(EC.presence_of_element_located(locator))
-        # temp.clear()
-        # temp.send_keys(domain)
-
-        # locator=(By.XPATH,'//button[@class="btn btn-default"][1]')
-        # search=wait.until(EC.element_to_be_clickable(locator))
-        # search.click()
-
-        tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
-        # print(tr_list)
-        index=1
-        page=1
-        
-        domain_list=[]
-        current_url = browser.current_url
-        while True :
-            
-            # locator=(By.XPATH,f'//table[@id="CdnInfoTable"]/tbody[1]/tr[{index}]//a[@class="btn-primary"]')
-            locator=(By.XPATH,f'//table[@id="CdnInfoTable"]/tbody[1]/tr[{index}]/td[10]/a[1]/span')
-            try : domain_info=wait.until(EC.element_to_be_clickable(locator)).click()
-            except TimeoutException as err: 
-                print('next_page')
-                page+=1
-                browser.get(current_url + f"?PageIndex={page}")
-                tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
-
-                if len(tr_list) == 0 :
-                    break
-
-                # locator=(By.XPATH,'//li[@class="paginate_button next  "]/a')
-                # try : next_page=wait.until(EC.element_to_be_clickable(locator)).click()
-                # except TimeoutException as err:
-                #     break
-                index=1
-                continue
-
-            locator=(By.XPATH,'//input[@id="Domain"]')
-            domain_name=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
-            print(domain_name)
-            locator=(By.XPATH,'//input[@id="CNAME"]')
-            domain_cname=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
-            locator=(By.XPATH,'//div[@class="form-group"][4]//input')
-            domain_origin=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
-            locator=(By.XPATH,'//div[@class="form-group"][6]//input[@id="SourcePort"]')
-            domain_origin_port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+    tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
     
-            domain_dict={
-                'domain':domain_name,
-                'cname':domain_cname,
-                'origin':domain_origin,
-                'origin_port':domain_origin_port
-            }
-            print(domain_dict)
-            
-            # locator=(By.XPATH,'//div[@class="callout-link"]//a[2]')
-            # previous=wait.until(EC.element_to_be_clickable(locator)).click()
+    index=1
+    page=1
+    
+    domain_list=[]
+    current_url = browser.current_url
+    while True :
+        
+        locator=(By.XPATH,f'//table[@id="CdnInfoTable"]/tbody[1]/tr[{index}]/td[10]/a[1]/span')
+        try : domain_info=wait.until(EC.element_to_be_clickable(locator)).click()
+        except TimeoutException as err: 
+            print('next_page')
+            page+=1
             browser.get(current_url + f"?PageIndex={page}")
-            index+=2
-            domain_list.append(domain_dict)
-        print(domain_list[0:2])
-        print(len(domain_list))
-        sys.exit()
+            tr_list=browser.find_elements(By.XPATH,'//table[@id="CdnInfoTable"]/tbody[1]/tr')
+
+            if len(tr_list) == 0 :
+                break
+
+            index=1
+            continue
+
+        locator=(By.XPATH,'//input[@id="Domain"]')
+        domain_name=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        print(domain_name)
+        locator=(By.XPATH,'//input[@id="CNAME"]')
+        domain_cname=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//div[@class="form-group"][4]//input')
+        domain_origin=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//div[@class="form-group"][6]//input[@id="SourcePort"]')
+        domain_origin_port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+
+        domain_dict={
+            'domain':domain_name,
+            'cname':domain_cname,
+            'origin':domain_origin,
+            'origin_port':domain_origin_port
+        }
+        print(domain_dict)
         
-        locator=(By.XPATH,f'//table[@id="CdnInfoTable"]/tbody[1]/tr[{index}]//a[@class="btn btn-info"][1]')
-        infopage=wait.until(EC.element_to_be_clickable(locator))
-        infopage.click()
+        browser.get(current_url + f"?PageIndex={page}")
+        index+=2
+        domain_list.append(domain_dict)
 
-        locator=(By.XPATH,'//li[@id="Https"]')
-        https_page=wait.until(EC.element_to_be_clickable(locator))
-        https_page.click()
-        
-        #抓取目前開關 value
-        locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="switch"][1]//input[@name="IsHttps"]')
-        ishttps=wait.until(EC.presence_of_element_located(locator))
-        https_value=ishttps.get_attribute('value')
-        
-        if not int(https_value):
-            # print(123)
-            locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="switch"][1]//span[2]')
-            open_https=wait.until(EC.element_to_be_clickable(locator))
-            # print(open_https.text)
-            open_https.click()
-
-            locator=(By.XPATH,'//input[@id="HttpsPort"]')
-            https_port=wait.until(EC.presence_of_element_located(locator))
-            try : 
-                https_port.clear()
-            except: pass
-
-            https_port.send_keys(port)
-        
-
-        if int(force) : 
-
-            locator=(By.XPATH,'//div[@id="tabHttps"]//input[@name="IsForceHttps"]')
-            isforce=wait.until(EC.presence_of_element_located(locator))
-            isforce_value=isforce.get_attribute('value')
-
-            
-            if not int(isforce_value) : 
-
-                locator=(By.XPATH,'//div[@id="tabHttps"]//div[@class="form-group"][2]//span[2]')
-                force_https=wait.until(EC.presence_of_element_located(locator))
-                force_https.click()
-
-
-        locator=(By.XPATH,'//input[@name="CertificatesType" and @value="1"]')
-        cert_type=wait.until(EC.element_to_be_clickable(locator))
-        cert_type.click()
-        
-        locator=(By.XPATH,'//input[@name="CertificatesName"]')
-        cert_name=wait.until(EC.presence_of_element_located(locator))
-        cert_name.clear()
-        cert_name.send_keys(now+"_"+domain)
-
-        locator=(By.XPATH,'//textarea[@name="CertificatesContent"]')
-        cert_content=wait.until(EC.presence_of_element_located(locator))
-        cert_content.clear()
-        cert_content.send_keys(cert)
-
-        locator=(By.XPATH,'//textarea[@name="PrivateKey"]')
-        privatekey=wait.until(EC.presence_of_element_located(locator))
-        privatekey.clear()
-        privatekey.send_keys(key)
-
-        locator=(By.XPATH,'//*[@id="formHttps"]//button[@class="btn btn-warning"]')
-        submit=wait.until(EC.element_to_be_clickable(locator))
-        submit.click()
-
-        locator=(By.XPATH,'//button[@id="J-alert-Ok"]')
-        check=wait.until(EC.element_to_be_clickable(locator))
-        check.click()
-
-        log_list.append(str({domain:"success"}))
-
+    print(domain_list[0:2])
+    print(len(domain_list))
     browser.quit()
-    now_time=datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
-    try : 
-        with open("ychttps.log",'r+') as f : 
-            old_content=f.read()
-            f.seek(0)
-            f.write(f"\n{now_time}\n")
-            f.write("\n".join(log_list))
-            f.write("\n"+old_content)
-    except FileNotFoundError : 
-        with open("ychttps.log",'w+') as f : 
-            f.write(f"\n{now_time}\n")
-            f.write("\n".join(log_list))
+    with open(f"{path}/yccdn/domain_info/{file_name}.json","w+") as f : 
+        f.write(json.dumps(domain_list))
+    
+    return domain_list
+    
 
 
-
-def get_ycssl(domain):
-    url="http://yc-api.cdnvips.net/Cdn/getCert"
-    data={
-        'domain':domain
-    }
-
-    result=requests.post(url,data=data).json()
-    return result
 
 if __name__ == "__main__":
     cusid='yc'
-    dlist=['m.bosco.live']
-    port=443
-    change_set(cusid,dlist,port)
-    # print(log_list)
-    
 
-
-    # print(cert)
-    # print('==============')
-    # print(key)
+    # print(get_domains(cusid))
+    with open("test.json","w+") as f : 
+        f.write(json.dumps(get_domains(cusid)))

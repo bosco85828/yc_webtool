@@ -1,23 +1,27 @@
 import monitor_order
 import re
+import os 
 import time
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request , send_file
 import threading
 from queue import Queue
 import yccdn_add_domain
 import sc_white
 import search_cnzzcode
 import create_cnzz
+from yccdn.list_domain import get_domains
 import uploadSSL
 import alidns_set
 import yc_https_set
 from datetime import datetime
 import sync_config
 import new_cnzz
+import json
 
 app = Flask(__name__)
 qlist=Queue()
 lock = threading.Lock()
+path=os.getcwd()
 
 # @app.route("/<name>",methods=['GET'])
 # def hello(name):
@@ -46,6 +50,30 @@ def hello():
 @app.route("/form")
 def form():
     return render_template('form.html')
+
+@app.route("/yc_domains")
+def yc_domains():
+    return render_template('yc_domains.html',**locals())
+
+@app.route("/yc_domains_completed",methods=['POST'])
+def yc_domains_completed():
+    customer_ID=request.values['customer_ID']
+    file_name=request.values['file_name']
+    t1=threading.Thread(target=get_domains,args=(customer_ID,file_name))
+    t1.start()
+    
+    return render_template('yc_domains_completed.html',**locals())
+
+@app.route("/yc_domains_list")
+def yc_domains_list():
+    files=os.listdir(f"{path}/yccdn/domain_info")
+    return render_template('file_list.html',**locals())
+
+@app.route("/download/<filename>")
+def download_file(filename):
+    file_path=f"{path}/yccdn/domain_info/{filename}"
+    return send_file(file_path, as_attachment=True)
+
 
 
 
