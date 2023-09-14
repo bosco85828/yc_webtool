@@ -134,13 +134,39 @@ def get_domains(cusid,file_name):
         domain_origin=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
         locator=(By.XPATH,'//div[@class="form-group"][6]//input[@id="SourcePort"]')
         domain_origin_port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//input[@name="AccelerationDomainPort"]')  
+        port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//input[@name="IsRedirect"]')
+        redirect=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//input[@name="IsBackToSourcerHost"]')
+        custom_host=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//input[@name="IsHttps"]')
+        https=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
 
+        if int(https):
+            locator=(By.XPATH,'//input[@name="HttpsPort"]')
+            https_port=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        else:https_port=None
+
+        if int(custom_host) : 
+            locator=(By.XPATH,'//input[@name="CustomDomain"]')
+            custom_domain=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        else : custom_domain = None
+            
         domain_dict={
-            'domain':domain_name,
-            'cname':domain_cname,
-            'origin':domain_origin,
-            'origin_port':domain_origin_port
-        }
+                'domain':domain_name,
+                'request_port':port,
+                'cname':domain_cname,
+                'origin':domain_origin,
+                'origin_port':domain_origin_port,
+                'https':bool(int(https)),
+                'https_port':https_port,
+                'redirect':bool(int(redirect)),
+                'custom_host':bool(int(custom_host)),
+                'custom_host_name':custom_domain
+            }    
+        
+
         print(domain_dict)
         
         browser.get(current_url + f"?PageIndex={page}")
@@ -161,6 +187,6 @@ def get_domains(cusid,file_name):
 if __name__ == "__main__":
     cusid='yc'
 
-    # print(get_domains(cusid))
-    with open("test.json","w+") as f : 
-        f.write(json.dumps(get_domains(cusid)))
+    get_domains(cusid,'yctest')
+
+        

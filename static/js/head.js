@@ -21,6 +21,7 @@ document.writeln("                    YCCDN");
 document.writeln("                    </a>");
 document.writeln("                    <ul class=\'dropdown-menu\'>");
 document.writeln("                    <li><a class=\'dropdown-item\' href=\'/ycadd\'>YCCDN批量建立</a></li>");
+document.writeln("                    <li><a class=\'dropdown-item\' href=\'/yc_domains\'>YCCDN查詢商戶域名</a></li>");
 document.writeln("                    <li><a class=\'dropdown-item\' href=\'/ycopenhttps\'>批量開啟 https</a></li>");
 document.writeln("                    <!-- <li><a class=\'dropdown-item\' href=\'/checkyctask\'>前次批量建立任務查詢</a></li> -->");
 document.writeln("                    <!-- <li><hr class=\'dropdown-divider\'></li>");
