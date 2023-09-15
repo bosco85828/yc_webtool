@@ -24,6 +24,8 @@ from OpenSSL import crypto
 from dotenv import load_dotenv
 import os 
 import json
+from enum import Enum, unique
+
 
 load_dotenv()
 YC_PASSWORD=os.getenv('YC_PASSWORD')
@@ -39,6 +41,17 @@ options.add_argument('--disable-dev-shm-usage')
 # options.add_argument("--headless") 
 now=datetime.now().strftime("%Y-%m-%d")
 path=os.getcwd()
+
+class AccelType(Enum):
+    api=1
+    web=2
+    websocket=3
+    large_file=4
+    small_file=5
+    other=6
+    
+
+
 def login(admin):
 
     s=Service()
@@ -142,6 +155,9 @@ def get_domains(cusid,file_name):
         custom_host=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
         locator=(By.XPATH,'//input[@name="IsHttps"]')
         https=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        locator=(By.XPATH,'//input[@checked="checked" and @name="AccelerationType"]')
+        type_=wait.until(EC.presence_of_element_located(locator)).get_attribute('value')
+        
 
         if int(https):
             locator=(By.XPATH,'//input[@name="HttpsPort"]')
@@ -163,7 +179,8 @@ def get_domains(cusid,file_name):
                 'https_port':https_port,
                 'redirect':bool(int(redirect)),
                 'custom_host':bool(int(custom_host)),
-                'custom_host_name':custom_domain
+                'custom_host_name':custom_domain,
+                'AccelerationType':AccelType(int(type_)).name
             }    
         
 
