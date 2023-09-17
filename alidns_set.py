@@ -6,6 +6,7 @@ from aliyunsdkalidns.request.v20150109.AddDomainRecordRequest import AddDomainRe
 from aliyunsdkalidns.request.v20150109.AddDomainRequest import AddDomainRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from aliyunsdkalidns.request.v20150109.UpdateDomainRecordRequest import UpdateDomainRecordRequest
+from aliyunsdkalidns.request.v20150109.SetDomainRecordStatusRequest import SetDomainRecordStatusRequest
 import json
 from datetime import datetime,timezone,timedelta
 from dotenv import load_dotenv
@@ -109,14 +110,33 @@ def change_domain_record(c_name,record_id,host,type_,value):
     result=client.do_action_with_exception(request_)
     return json.loads(str(result,encoding='utf-8')) 
 
+def disable_record(c_name,record_id):
+    client = AcsClient(
+        customer[c_name]['id'],
+        customer[c_name]['secret'],
+        'cn-shenzhen'
+    )
+
+    request_=SetDomainRecordStatusRequest()
+    request_.set_accept_format('json')
+    request_.set_RecordId(record_id)
+    request_.set_Status("Disable")
+
+    result=client.do_action_with_exception(request_)
+    return json.loads(str(result,encoding='utf-8')) 
+
 if __name__ == "__main__":
     input_domain=['bosco.com']
     # print(add_domain('sc',input_domain))
     records=get_domain_record('sc','bosco.com','www')['DomainRecords']['Record']
+    print(records)
     for record in records : 
+        print(record)
         if record['RR'] == "www" : 
             record_id = record['RecordId']
     
-    print(record_id)
+    # print(disable_record('sc','818288189989113856'))
+    
+    # print(record_id)
 
-    print(change_domain_record('sc',record_id,'www','CNAME','bosco.live'))
+    # print(change_domain_record('sc',record_id,'www','CNAME','bosco.live'))

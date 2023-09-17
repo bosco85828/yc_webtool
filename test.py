@@ -1,8 +1,8 @@
-import json 
-
-dict_={
-    'name':'bosco',
-    'age':26,
+test_dict={
+    'bosco':1,
+    'andy':2,
+    'anderson':3
 }
 
-print(type(json.dumps(dict_)))
+print(list(test_dict.keys()))
+print(list(test_dict.values()))

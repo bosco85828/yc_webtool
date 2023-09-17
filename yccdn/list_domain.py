@@ -5,6 +5,7 @@
 Command:
     python3 py_programming02.py
 """
+import csv
 import sys
 from datetime import datetime,timezone,timedelta
 import requests
@@ -179,7 +180,7 @@ def get_domains(cusid,file_name):
                 'https_port':https_port,
                 'redirect':bool(int(redirect)),
                 'custom_host':bool(int(custom_host)),
-                'custom_host_name':custom_domain,
+                'custom_host_name':str(custom_domain),
                 'AccelerationType':AccelType(int(type_)).name
             }    
         
@@ -193,8 +194,14 @@ def get_domains(cusid,file_name):
     print(domain_list[0:2])
     print(len(domain_list))
     browser.quit()
-    with open(f"{path}/yccdn/domain_info/{file_name}.json","w+") as f : 
-        f.write(json.dumps(domain_list))
+
+    with open(f"{path}/yccdn/domain_info/{file_name}.csv","w+") as f : 
+        writer=csv.writer(f)
+        writer.writerow(list(domain_dict.keys()))
+        for domain_dict in domain_list : 
+            writer.writerow(list(domain_dict.values()))
+
+        # f.write(json.dumps(domain_list))
     
     return domain_list
     
@@ -202,8 +209,8 @@ def get_domains(cusid,file_name):
 
 
 if __name__ == "__main__":
-    cusid='yc'
+    cusid='kk'
 
-    get_domains(cusid,'yctest')
+    get_domains(cusid,'yctest917')
 
         

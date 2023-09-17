@@ -5,7 +5,7 @@
 Command:
     python3 py_programming02.py
 """
-
+import sys
 from datetime import datetime,timezone,timedelta
 import requests
 from selenium.common.exceptions import NoSuchElementException,TimeoutException
@@ -266,15 +266,17 @@ def get_ycssl(domain):
         'domain':domain
     }
 
-    result=requests.post(url,data=data).json()
-    return result
+    result=requests.post(url,data=data)
+    print(result.text)
+    return result.json()
 
 if __name__ == "__main__":
     cusid='yc'
     dlist=['m.bosco.live']
-    port=443
-    change_set(cusid,dlist,port)
-    print(log_list)
+    print(get_ycssl(sys.argv[1]))
+    # port=443
+    # change_set(cusid,dlist,port)
+    # print(log_list)
     
     # print(cert)
     # print('==============')
