@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block app_content %}
+
+    <body>
+        
+        <div class="row">
+            <div class="col">
+            <!-- <h1>{{result}}</h1> -->
+            <a href="/"> 點選回到首頁 </a>
+            <br>
+            <h3> 以下為前次刪除 CDNW 紀錄:</h3>
+            <div class="col">
+                {% for log in task %}
+            
+                <a> {{ log }} </a>
+                <br>
+            
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+    
+    </body>
+    
+{% endblock %}
+
+

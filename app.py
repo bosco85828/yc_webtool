@@ -1,31 +1,30 @@
-import monitor_order
+from myproject.scripts import monitor_order
 import re
 import os 
 import time
-from flask import Flask, render_template, request , send_file
+from flask import Flask, render_template, request , send_file , jsonify ,redirect, url_for,make_response ,flash ,abort
+from flask_login import login_user, logout_user, login_required, current_user
+from myproject import app, db
+from myproject.models.user import User
+from myproject.form import LoginForm, RegistrationForm
 import threading
 from queue import Queue
-import yccdn_add_domain
-import sc_white
-import search_cnzzcode
-import create_cnzz
-from yccdn.list_domain import get_domains
-import uploadSSL
-import alidns_set
-import yc_https_set
+from myproject.scripts import yccdn_add_domain
+from myproject.scripts.list_domain import get_domains
+from myproject.scripts import uploadSSL
+from myproject.scripts import alidns_set
+from myproject.scripts import yc_https_set
 from datetime import datetime
-import sync_config
-import new_cnzz
+from myproject.scripts import sync_config
 import json
 
-app = Flask(__name__)
+
+
 qlist=Queue()
 lock = threading.Lock()
 path=os.getcwd()
 
-# @app.route("/<name>",methods=['GET'])
-# def hello(name):
-#     return f"Hello,{name}"
+
 class MyThread(threading.Thread):
     def __init__(self,func,args=()):
         super(MyThread,self).__init__()
@@ -42,20 +41,29 @@ class MyThread(threading.Thread):
             return None
         
 
+    
+@app.errorhandler(401)
+def unauthorized(error):
+    return redirect(url_for('/login'),code="302")
+
 
 @app.route("/")
+@login_required
 def hello():
     return render_template('index.html')
 
 @app.route("/form")
+@login_required
 def form():
     return render_template('form.html')
 
 @app.route("/yc_domains")
+@login_required
 def yc_domains():
     return render_template('yc_domains.html',**locals())
 
 @app.route("/yc_domains_completed",methods=['POST'])
+@login_required
 def yc_domains_completed():
     customer_ID=request.values['customer_ID']
     file_name=request.values['file_name']
@@ -65,11 +73,13 @@ def yc_domains_completed():
     return render_template('yc_domains_completed.html',**locals())
 
 @app.route("/yc_domains_list")
+@login_required
 def yc_domains_list():
     files=os.listdir(f"{path}/yccdn/domain_info")
     return render_template('file_list.html',**locals())
 
 @app.route("/download/<filename>")
+@login_required
 def download_file(filename):
     file_path=f"{path}/yccdn/domain_info/{filename}"
     return send_file(file_path, as_attachment=True)
@@ -78,10 +88,12 @@ def download_file(filename):
 
 
 @app.route("/DeleteCdnw")
+@login_required
 def delete_cdnw():
     return render_template('delete_cdnw.html')
 
 @app.route("/DeleteCdnwCompleted",methods=['POST'])
+@login_required
 def delete_cdnw_completed():
     input_domain=request.values['domain']
     domainlist=re.findall(r'[a-zA-Z.:0-9-]+',input_domain)
@@ -92,6 +104,7 @@ def delete_cdnw_completed():
     return render_template('delete_cdnw_completed.html',**locals())
 
 @app.route("/DeleteCdnwLog")
+@login_required
 def check_delete_cdnw_log():
     try :
         with open('delete_cdnw.log') as f :
@@ -103,10 +116,12 @@ def check_delete_cdnw_log():
     return render_template('check_delete_cdnw_log.html',**locals())
 
 @app.route("/SyncCdnw")
+@login_required
 def sync_cdnw_config():
     return render_template('sync_cdnw_config.html')
 
 @app.route("/SyncCdnwCompleted",methods=['POST'])
+@login_required
 def sync_cdnw_config_completed():
     input_domain=request.values['domain']
     try : input_refer=request.values['refer']
@@ -121,6 +136,7 @@ def sync_cdnw_config_completed():
     return render_template('sync_cdnw_config_completed.html',**locals())
 
 @app.route("/CheckSyncCdnwLog")
+@login_required
 def check_sync_cdnw_log():
     try :
         with open('sync_cdnw.log') as f :
@@ -133,11 +149,13 @@ def check_sync_cdnw_log():
 
 
 @app.route("/ycopenhttps")
+@login_required
 def yc_openhttps():
     return render_template('yc_openhttps.html')
     # return "功能暫未開放" , 404
 
 @app.route("/ycopenhttpscompleted",methods=['POST'])
+@login_required
 def yc_openhttps_completed():
     input_domain=request.values['domain_list']
     input_cusid=request.values['customer_ID']
@@ -152,6 +170,7 @@ def yc_openhttps_completed():
     return render_template('yc_openhttps_completed.html',**locals())
 
 @app.route("/checkychttps")
+@login_required
 def check_yc_https():
     try :
         with open('ychttps.log') as f :
@@ -164,46 +183,25 @@ def check_yc_https():
 
 
 @app.route("/ycadd")
+@login_required
 def ycadd():
     return render_template('yc_add.html')
     # return "功能暫未開放" , 404
 
-@app.route("/scwhite")
-def scwhite():
-    return render_template('scwhite.html')
 
 @app.route("/cdnwuploadssl")
+@login_required
 def cdnwuploadssl():
     return render_template('cdnw_uploadSSL.html')
 
-@app.route("/searchcnzz")
-def searchcnzz():
-    return render_template('searchcnzz.html')
-
-@app.route("/checkcnzz")
-def checkcnzz():
-    return render_template('checkcnzz.html')
-
-@app.route("/checkCnzzCompleted",methods=['POST'])
-def checkcnzz_completed():
-    input_domain=request.values['test']
-    dlist=re.findall(r'[0-9a-zA-Z:.-]+',input_domain)
-    result=[]
-    for domain in dlist : 
-        result.append(str(new_cnzz.compare_cnzz(domain)))
-
-    return render_template('checkcnzz_completed.html',**locals())
-
-
-@app.route("/createcnzz")
-def createcnzz():
-    return render_template('createcnzz.html')
 
 @app.route("/alidnsadddomain")
+@login_required
 def alidns_add_domain():
     return render_template('alidns_add_domain.html')
 
 @app.route("/alidnsadddomaincompleted",methods=['POST'])
+@login_required
 def alidns_add_domain_completed():
     input_customer_name=request.values['c_name']
     input_domain=request.values['domain']
@@ -215,6 +213,7 @@ def alidns_add_domain_completed():
     return render_template('alidns_add_domain_completed.html',**locals())
 
 @app.route("/checkcdnwssllog")
+@login_required
 def check_cdnw_ssllog():
     try:
         with open('cdnw_uploadssl.log') as f :
@@ -226,6 +225,7 @@ def check_cdnw_ssllog():
     return render_template('check_cdnw_ssllog.html',**locals())
 
 @app.route("/cdnwuploadsslcompleted",methods=['POST'])
+@login_required
 def cdnw_uploadssl_completed():
     input_domain=request.values['domain']
     
@@ -235,63 +235,8 @@ def cdnw_uploadssl_completed():
     return render_template('cdnw_uploadSSL_completed.html')
 
 
-@app.route("/createcnzzcompleted",methods=['POST'])
-def creatd_cnzzcompleted():
-
-    input_token=request.values['token']
-    input_cookie=request.values['cookie']
-    input_domain=request.values['domain']
-
-    domainlist=create_cnzz.main(input_domain,input_cookie,input_token)
-
-    print(domainlist)
-
-    return render_template('creatd_cnzzcompleted.html',**locals())
-
-@app.route("/searchcnzzcompleted",methods=['POST'])
-def searchcnzz_completed():
-    input_token=request.values['token']
-    input_domain=request.values['domain']
-    
-    result=search_cnzzcode.main(input_token,input_domain)
-    print(result)
-    return render_template('searchcnzz_completed.html',**locals())
-
-
-@app.route("/scwhitecompleted",methods=['POST'])
-def scwhite_completed():
-    input_dcodelist=request.values['domain_list']
-    input_order=request.values['data_order']
-    input_statistics=request.values['statistics']
-    input_merchant=request.values['merchant']
-    input_domain_merchant=request.values['domain_merchant']
-    # print(input_dcodelist)
-    # print(input_order)
-    # print(input_statistics)
-    # print(input_merchant)
-
-    t1=threading.Thread(target=sc_white.main,args=(input_dcodelist,input_order,input_statistics,input_merchant,input_domain_merchant))
-    t1.start()
-
-
-    return render_template('scwhite_completed.html')
-
-
-@app.route("/checkscwhite")
-def checkscwhite():
-    try:
-        with open("scwhite.log") as f : 
-            task=f.readlines()
-        print(task)
-    except FileNotFoundError : 
-        task=['We currently do not have any log.']
-    
-    return render_template('checkscwhite.html',**locals())
-
-
-
-
 @app.route("/ycaddcompleted",methods=['POST'])
+@login_required
 def ycadd_completed():
     
     domain=request.values['domain_list']
@@ -302,22 +247,14 @@ def ycadd_completed():
     redirect=request.values['redirect'] or None
     cusID=request.values['customer_ID']
     domainlist=re.findall(r'[a-zA-Z.:0-9-]+',domain)
-    # domainlist=[ x for x in domain.split(',')]
-    # print(domainlist)
-    # with open("ycadd.log","r+") as f :
-    #     old_content=f.read()
-    #     f.seek(0)
-    #     f.write(f"\n{datetime.now()}\n")
-    #     f.write(old_content)
-    
+
     t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()
     
-    
-    # print(domainlist,request_port,origin_addr,origin_port,type_,redirect)
     return render_template('yc_add_completed.html',**locals())
 
 @app.route("/checkyctask")
+@login_required
 def checkyctask():
     try:
         with open("ycadd.log") as f : 
@@ -329,6 +266,7 @@ def checkyctask():
     return render_template('check_yc_task.html',**locals())
 
 @app.route("/checkalidnsdomaintask")
+@login_required
 def check_alidns_adddomainlog():
     with open("alidns_adddomain.log") as f : 
         task=f.readlines()
@@ -338,6 +276,7 @@ def check_alidns_adddomainlog():
 
 
 @app.route("/submit",methods=['POST'])
+@login_required
 def submit():
     domain = request.values['test']
     
@@ -369,7 +308,61 @@ def submit():
     print(result)
 
     return render_template('submit.html',**locals())
+ 
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        print(123)
+        user = User.query.filter_by(email=form.email.data).first()
+        print(user.email)
+        print(form.email.data)
+        print(form.password.data)
+        if form.email.data == user.email and  user.check_password(form.password.data):
+            login_user(user)
+            print('登入成功')
+            flash("您已經成功的登入系統",category='success')
+            next = request.args.get('next')
+            if next == None or not next[0]=='/':
+                next = url_for('home')
+            print(current_user.email)
+            return redirect(next)
+        else : 
+            flash("Login failed.",category='warning')        
+            return render_template('login.html',form=form)
     
+    return render_template('login.html',form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash("您已經登出系統")
+    return redirect(url_for('home'))
+
+@app.route('/register',methods=['GET','POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data,
+        username=form.username.data, password=form.password.data)
+        # add to db table
+        db.session.add(user)
+        db.session.commit()
+        flash("感謝註冊本系統成為會員",category='success')
+        return redirect(url_for('login'))
+    return render_template('register.html',form=form)
+
+@app.route('/welcome')
+@login_required
+def welcome_user():
+    return render_template('welcome_user.html')
 
 if __name__ == '__main__':
-    app.run('0.0.0.0',debug=True)
+    app.run("0.0.0.0",debug=True)

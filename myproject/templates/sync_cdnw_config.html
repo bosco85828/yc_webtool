@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block app_content %}
+    <body>
+    <form method="POST" action="{{url_for('sync_cdnw_config_completed')}}">
+        <meta charset="utf-8">
+        <style type="text/css">
+            /* .btn{
+                background-color:orange;
+                border: none;
+                font-size: 20px;
+                font-weight: normal;
+                color: #0c3e29;
+                outline:none;
+                cursor:pointer;
+                padding: 15px 25px ;
+                box-shadow: 0 9px #bbb;
+                border-radius: 10px;
+            } */
+            .btn:hover{
+                background-color: darkorange;
+            }
+
+            .btn:active{
+                background-color:darkorange;
+                box-shadow: 0 3px #aaa;
+                transform:translateY(4px);
+            }
+        </style>
+        <div class="container">    
+            <br>   
+            <div style="text-align:center">
+                <h2> 批量將 YCCDN 上域名設定同步至 CDNW 上建立域名 </h2>  
+            </div>     
+            <br>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label"> 域名 : </label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" name="domain" required="required" rows="10" placeholder="請輸入 CDNetWorks 需建立之域名清單，並確認域名在 YCCDN 上已建立，多個域名可用換行或者,隔開。
+                bill.com
+                bosco.live
+                bill.cc"></textarea>
+            </div>
+            <br>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label"> 參照域名(可空白) : </label>
+                <input type="text" class="form-control" id="exampleFormControlInput4" name="refer">
+            </div>
+            <br>
+            <div style="text-align:center">
+                <button type="submit" class="btn btn-success" >Submit</button>
+            </div>
+            <!-- <div style = "margin:3em;" > 
+                <button type="submit" class="btn btn-primary btn-lg" id="load2" data-loading-text="<i class = 'fa fa-spinner fa-spin ' ></i>  Processing Order">Submit</button> 
+            </div> -->
+        </div>
+    </form>
+
+    </body>
+{% endblock %}

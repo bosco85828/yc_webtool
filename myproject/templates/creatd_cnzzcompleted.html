@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block app_content %}
+  <div class="row">
+      <div class="col">
+      <!-- <h1>{{result}}</h1> -->
+      <a href="/"> 點選回到首頁 </a>
+      <br>
+      <h2> 提交成功，請稍候至 CNZZ 後台檢查，建立域名清單如下:</h2>
+      <div class="col">
+          <table cellpadding="5" border="1">
+            {% for domain in domainlist %}
+            <tr>
+                <th> {{ domain }} </th>
+                <br>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+    
+  
+
+{% endblock %}

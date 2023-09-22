@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block app_content %}
+
+    <body>
+        <form method="POST" action="{{url_for('scwhite_completed')}}">
+            <meta charset="utf-8">
+            <style type="text/css">
+                /* .btn{
+                    background-color:orange;
+                    border: none;
+                    font-size: 20px;
+                    font-weight: normal;
+                    color: #0c3e29;
+                    outline:none;
+                    cursor:pointer;
+                    padding: 15px 25px ;
+                    box-shadow: 0 9px #bbb;
+                    border-radius: 10px;
+                } */
+                .btn:hover{
+                    background-color: darkorange;
+                }
+        
+                .btn:active{
+                    background-color:darkorange;
+                    box-shadow: 0 3px #aaa;
+                    transform:translateY(4px);
+                }
+            </style>
+            <div class="container">
+                <!-- <div class="mb-3">
+                    <br>
+                    <label for="exampleFormControlInput1" class="form-label"> 商戶名稱 : </label>
+                    <select class="form-select" aria-label="Default select example" name="merchant">
+                        <option selected>請點選商戶</option>
+                        <option value="1">196TY</option>
+                        <option value="2">KK</option>                    
+                    </select>
+                </div>
+                <br>            
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"> 站點名稱 : </label>
+                    <select class="form-select" aria-label="Default select example" name="station">
+                        <option selected>請點選站點名稱</option>
+                        <option value="1">W體育</option>
+                        <option value="2">196體育</option>                  
+                    </select>
+                </div> -->
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"> 商戶名稱 : </label>
+                    <select class="form-select" aria-label="Default select example" name="merchant" required>
+                        <option value="SC">SC</option>
+                        <option value="SEO">SEO</option>
+                    </select>
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"> 域名商戶種類 : </label>
+                    <select class="form-select" aria-label="Default select example" name="domain_merchant" required>
+                        <option value="1"> 196TY </option>
+                        <option value="2" disabled="disabled"> KK體育 </option>
+                        <option value="3"> T體育 </option>
+                    </select>
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"> 統計碼供應商 : </label>
+                    <select class="form-select" aria-label="Default select example" name="statistics" required>
+                        <option value="0"> 友盟cnzz </option>
+                        <option value="1"> 百度 </option>
+                        <option value="2"> Google </option>
+                    </select>
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label"> 域名 & 邀請碼 & 統計碼: </label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" name="domain_list" required="required" rows="10" placeholder="請輸入 域名/邀請碼/統計碼 格式請參照以下，中間為半形空格。
+                    bill.com 1234 s9.cnzz.com:1281219776
+                    bill.live 4321 v1.cnzz.com:1281219777
+                    bill.cn 2222 s4.cnzz.com:1281219781"></textarea>
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label"> 選單順序: ( 請按照 电子、真人、棋牌、彩票、捕鱼、体育、电竞 針對各個項目想要的排序填入順序號 ) <br> ex. 我想要 电子(3)在第三格/真人(1)在第一格/棋牌(2)在第二格/彩票(4)在第四格 以此類推，就填寫 3124567 </label>
+                    <input type="number" class="form-control" id="exampleFormControlInput2" name="data_order" required="required" placeholder="請輸入順序，以 SC-h5 默認順序來說就是填寫 1234567。">
+                </div>
+                <br>
+                <div style="text-align:center">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </div>
+        </form>
+    </body>
+{% endblock %}

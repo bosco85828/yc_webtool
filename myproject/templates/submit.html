@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block app_content %}
+  <div class="row">
+    <div class="col">
+    <!-- <h1>{{result}}</h1> -->
+    <a href="/"> 點選回到首頁 </a>
+    <h2>The correct domain count: </h2>
+    <a>{{ correct_count }}</a>
+    <br>
+    <h2>此次檢查選單順序如下</h2>
+    <a>{{ check_banner_order }}</a>
+    <br>
+    <br>
+    <a> PS. </a><br>
+    <a> hotgame => 熱門 <br> electronic => 電子 <br> qpgame => 棋牌 <br> live => 真人 <br> cpgame => 彩票 <br> sports => 運動 <br> hunter => 捕魚 <br>esports => 電競 </a><br>
+    <br>
+    <h2>The wrong domain: </h2>
+    </div>
+    <div class="col">
+      <table cellpadding="5" border="1">
+        {% for key, value in result.items() %}
+        <tr>
+            <th> {{ key }} </th>
+            <td> {{ value }} </td>
+            <br>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock %}
