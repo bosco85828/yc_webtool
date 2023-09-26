@@ -6,6 +6,7 @@ from flask import Flask, render_template, request , send_file , jsonify ,redirec
 from flask_login import login_user, logout_user, login_required, current_user
 from myproject import app, db
 from myproject.models.user import User
+from myproject.models.audit_log import Audit
 from myproject.form import LoginForm, RegistrationForm
 import threading
 from queue import Queue
@@ -48,8 +49,7 @@ def unauthorized(error):
 
 
 @app.route("/")
-@login_required
-def hello():
+def home():
     return render_template('index.html')
 
 @app.route("/form")
@@ -69,6 +69,15 @@ def yc_domains_completed():
     file_name=request.values['file_name']
     t1=threading.Thread(target=get_domains,args=(customer_ID,file_name))
     t1.start()
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'List YCCDN  merchant domains.',
+            'customer_ID':customer_ID,
+            'file_name':file_name
+        })
+    )
+    audit.add_log()
     
     return render_template('yc_domains_completed.html',**locals())
 
@@ -101,6 +110,15 @@ def delete_cdnw_completed():
     t1=threading.Thread(target=sync_config.delete_domain,args=(domainlist,))
     t1.start()
 
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'Delete domains on CDNW.',
+            'domains':domainlist
+        })
+    )
+    audit.add_log()
+
     return render_template('delete_cdnw_completed.html',**locals())
 
 @app.route("/DeleteCdnwLog")
@@ -132,6 +150,16 @@ def sync_cdnw_config_completed():
 
     t1=threading.Thread(target=sync_config.main,args=(domainlist,input_refer))
     t1.start()
+
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'Sync YCCDN domain to CDNW.',
+            'domains':input_domain,
+            'refer_domain':input_refer
+        })
+    )
+    audit.add_log()
 
     return render_template('sync_cdnw_config_completed.html',**locals())
 
@@ -167,6 +195,18 @@ def yc_openhttps_completed():
     t1=threading.Thread(target=yc_https_set.change_set,args=(input_cusid,domainlist,input_port,input_force))
     t1.start()
 
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'YCCDN open https.',
+            'domains':input_domain,
+            'customer_id':input_cusid,
+            'https_port':input_port,
+            'force_https':input_force,
+        })
+    )
+    audit.add_log()
+
     return render_template('yc_openhttps_completed.html',**locals())
 
 @app.route("/checkychttps")
@@ -195,22 +235,22 @@ def cdnwuploadssl():
     return render_template('cdnw_uploadSSL.html')
 
 
-@app.route("/alidnsadddomain")
-@login_required
-def alidns_add_domain():
-    return render_template('alidns_add_domain.html')
+# @app.route("/alidnsadddomain")
+# @login_required
+# def alidns_add_domain():
+#     return render_template('alidns_add_domain.html')
 
-@app.route("/alidnsadddomaincompleted",methods=['POST'])
-@login_required
-def alidns_add_domain_completed():
-    input_customer_name=request.values['c_name']
-    input_domain=request.values['domain']
-    dlist=re.findall(r'[0-9a-zA-Z:.-]+',input_domain)
-    t1=threading.Thread(target=alidns_set.add_domain,args=(input_customer_name,dlist))
-    t1.start()
-    # result_list=alidns_set.add_domain(input_customer_name,dlist)
+# @app.route("/alidnsadddomaincompleted",methods=['POST'])
+# @login_required
+# def alidns_add_domain_completed():
+#     input_customer_name=request.values['c_name']
+#     input_domain=request.values['domain']
+#     dlist=re.findall(r'[0-9a-zA-Z:.-]+',input_domain)
+#     t1=threading.Thread(target=alidns_set.add_domain,args=(input_customer_name,dlist))
+#     t1.start()
+#     # result_list=alidns_set.add_domain(input_customer_name,dlist)
     
-    return render_template('alidns_add_domain_completed.html',**locals())
+#     return render_template('alidns_add_domain_completed.html',**locals())
 
 @app.route("/checkcdnwssllog")
 @login_required
@@ -232,6 +272,15 @@ def cdnw_uploadssl_completed():
     t1=threading.Thread(target=uploadSSL.main,args=(input_domain,))
     t1.start()
     
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'upload CDNW SSL',
+            'domains':input_domain
+        })
+    )
+    audit.add_log()
+
     return render_template('cdnw_uploadSSL_completed.html')
 
 
@@ -250,6 +299,20 @@ def ycadd_completed():
 
     t1=threading.Thread(target=yccdn_add_domain.add_domain,args=(cusID,domainlist,request_port,origin_addr,origin_port,type_,redirect))
     t1.start()
+    audit=Audit(
+        email=current_user.email,
+        action=json.dumps({
+            'action':'add YCCDN domains.',
+            'domains':domainlist,
+            'request_port':request_port,
+            'origin_addr':origin_addr,
+            'origin_port':origin_port,
+            'type':type_,
+            'redirect':redirect,
+            'customer_id':cusID
+        })
+    )
+    audit.add_log()
     
     return render_template('yc_add_completed.html',**locals())
 
@@ -275,44 +338,41 @@ def check_alidns_adddomainlog():
     return render_template('check_alidns_adddomainlog.html',**locals())
 
 
-@app.route("/submit",methods=['POST'])
-@login_required
-def submit():
-    domain = request.values['test']
+# @app.route("/submit",methods=['POST'])
+# @login_required
+# def submit():
+#     domain = request.values['test']
     
-    try : banner = request.values['banner']
-    except : banner = None
+#     try : banner = request.values['banner']
+#     except : banner = None
 
-    statistics = request.values['statistics']
-    merchant = request.values['merchant']
-    # print(threading.active_count())
-    t=threading.Thread(target=monitor_order.main,args=(domain,qlist,banner,statistics,merchant))
+#     statistics = request.values['statistics']
+#     merchant = request.values['merchant']
+#     # print(threading.active_count())
+#     t=threading.Thread(target=monitor_order.main,args=(domain,qlist,banner,statistics,merchant))
     
-    # temp_1=monitor_order.main(domain)
-    t.start()
-    # lock.acquire()
-    t.join()
-    print("merchant:" + str(merchant))
-    if str(merchant) == "0":
-        check_banner_order=qlist.get()
-        print("check: "+ str(check_banner_order))
+#     # temp_1=monitor_order.main(domain)
+#     t.start()
+#     # lock.acquire()
+#     t.join()
+#     print("merchant:" + str(merchant))
+#     if str(merchant) == "0":
+#         check_banner_order=qlist.get()
+#         print("check: "+ str(check_banner_order))
 
-    correct_count=qlist.get()
-    temp_1 = qlist.get()
-    print("correct_count:" + str(correct_count))
-    print("temp:" + str(temp_1))
-    temp_2=[(x.split('>')) for x in temp_1]
-    result={ x:y for x,y in temp_2}
-    # lock.release()
+#     correct_count=qlist.get()
+#     temp_1 = qlist.get()
+#     print("correct_count:" + str(correct_count))
+#     print("temp:" + str(temp_1))
+#     temp_2=[(x.split('>')) for x in temp_1]
+#     result={ x:y for x,y in temp_2}
+#     # lock.release()
     
-    print(result)
+#     print(result)
 
-    return render_template('submit.html',**locals())
+#     return render_template('submit.html',**locals())
  
 
-@app.route('/')
-def home():
-    return render_template('home.html')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -332,6 +392,14 @@ def login():
             if next == None or not next[0]=='/':
                 next = url_for('home')
             print(current_user.email)
+            audit=Audit(
+                email=current_user.email,
+                action=json.dumps({
+                    'action':"Login success."
+                })
+            )
+            audit.add_log()
+
             return redirect(next)
         else : 
             flash("Login failed.",category='warning')        
@@ -355,7 +423,16 @@ def register():
         # add to db table
         db.session.add(user)
         db.session.commit()
+
         flash("感謝註冊本系統成為會員",category='success')
+        audit=Audit(
+            email=user.email,
+            action=json.dumps({
+                'action':"Created account."
+            })
+        )
+        audit.add_log()
+
         return redirect(url_for('login'))
     return render_template('register.html',form=form)
 

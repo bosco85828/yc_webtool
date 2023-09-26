@@ -7,6 +7,7 @@ from flask_login import LoginManager
 
 from flask_bootstrap import Bootstrap
 # from myproject.models.user import User
+# from myproject.models.audit_log import Audit
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,7 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:bosco85828@host.d
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 with app.app_context():
     db = SQLAlchemy(app)
-    db.create_all()
     Migrate(app,db)
 
 login_manager = LoginManager()

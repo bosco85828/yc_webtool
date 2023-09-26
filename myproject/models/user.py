@@ -10,6 +10,9 @@ class User(db.Model, UserMixin):
     email    = db.Column(db.String(64),unique=True, index=True)
     username = db.Column(db.String(64),unique=True, index=True)
     password_hash = db.Column(db.String(128))
+    # audits=db.relationship('Audit', back_populates='audits')
+    audits=db.relationship('Audit', backref="user")
+    
     def __init__(self, email, username, password):
         """初始化"""
         self.email = email
@@ -20,6 +23,8 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         """檢查使用者密碼"""
         return check_password_hash(self.password_hash, password)
+    
+
     
 @login_manager.user_loader
 def load_user(user_id):
