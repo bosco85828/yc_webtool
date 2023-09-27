@@ -1,0 +1,26 @@
+
+{% extends "base.html" %}
+{% block app_content %}
+
+    <table>
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Action</th>
+            <th>Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in data %}
+            <tr>
+                <td>{{ i.email }}</td>
+                <td>{{ i.action }}</td>
+                <td>{{ i.created_at }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {{ paginate.links }}
+    
+{% endblock %}
+

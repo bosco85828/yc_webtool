@@ -18,6 +18,8 @@ from myproject.scripts import yc_https_set
 from datetime import datetime
 from myproject.scripts import sync_config
 import json
+from sqlalchemy import desc
+from flask_paginate import Pagination
 
 
 
@@ -440,6 +442,23 @@ def register():
 @login_required
 def welcome_user():
     return render_template('welcome_user.html')
+
+
+@app.route('/audit_log')
+@login_required
+def audit_log(limit=20):
+    page = request.args.get('page', type=int, default=1)
+    print(page)
+    data=db.session.query(Audit).all()
+    start=(page-1)*limit
+    end =  page * limit if len(data) > page * limit  else len(data)
+    print(start,end)
+    paginate = Pagination(page=page,per_page=20, total=len(data))
+    print(paginate.links)
+
+    ret = db.session.query(Audit).order_by(desc(Audit.created_at)).slice(start, end)
+    return render_template('audit_log.html', data=ret, paginate=paginate)
+
 
 if __name__ == '__main__':
     app.run("0.0.0.0",debug=True)
