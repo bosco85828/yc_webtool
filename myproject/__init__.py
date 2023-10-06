@@ -12,6 +12,7 @@ import os
 load_dotenv()
 DB_USER=os.getenv('DB_USER')
 DB_SECRET=os.getenv('DB_SECRET')
+DB_PATH=os.getenv('DB_PATH')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -19,7 +20,7 @@ app = Flask(__name__)
 Bootstrap(app)
 app.config['SECRET_KEY']= 'acretkeyinthisproject'
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_SECRET}@host.docker.internal:3306/bill_tool'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_SECRET}@{DB_PATH}:3306/bill_tool'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 with app.app_context():
     db = SQLAlchemy(app)
