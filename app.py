@@ -7,7 +7,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from myproject import app, db
 from myproject.models.user import User
 from myproject.models.audit_log import Audit
-from myproject.form import LoginForm, RegistrationForm
+from myproject.form import LoginForm, RegistrationForm , ChangeForm, CloudflareDNS
 import threading
 from queue import Queue
 from myproject.scripts import yccdn_add_domain
@@ -17,10 +17,11 @@ from myproject.scripts import alidns_set
 from myproject.scripts import yc_https_set
 from datetime import datetime
 from myproject.scripts import sync_config
+from myproject.scripts.cloudflare_dns import main as cf_main
 import json
 from sqlalchemy import desc
 from flask_paginate import Pagination
-
+from wtforms import ValidationError
 
 
 qlist=Queue()
@@ -86,13 +87,13 @@ def yc_domains_completed():
 @app.route("/yc_domains_list")
 @login_required
 def yc_domains_list():
-    files=os.listdir(f"{path}/yccdn/domain_info")
+    files=os.listdir(f"{path}/myproject/scripts/domain_info")
     return render_template('file_list.html',**locals())
 
 @app.route("/download/<filename>")
 @login_required
 def download_file(filename):
-    file_path=f"{path}/yccdn/domain_info/{filename}"
+    file_path=f"{path}/myproject/scripts/domain_info/{filename}"
     return send_file(file_path, as_attachment=True)
 
 
@@ -383,10 +384,8 @@ def login():
     if form.validate_on_submit():
         print(123)
         user = User.query.filter_by(email=form.email.data).first()
-        print(user.email)
-        print(form.email.data)
-        print(form.password.data)
-        if form.email.data == user.email and  user.check_password(form.password.data):
+        
+        if user and  form.email.data == user.email and  user.check_password(form.password.data):
             login_user(user)
             print('登入成功')
             flash("您已經成功的登入系統",category='success')
@@ -416,12 +415,66 @@ def logout():
     flash("您已經登出系統")
     return redirect(url_for('home'))
 
+@app.route('/cfdns',methods=['GET','POST'])
+@login_required
+def cloudflare_dns():
+    form=CloudflareDNS()
+    if form.validate_on_submit():
+        action=form.action.data
+        
+        if action == 'delete' : len_limit=2
+        elif action == 'add' : len_limit=3       
+        elif action == "modify" : len_limit=4
+            
+        try : infos=[ tuple(x.split()) for x in form.infos.data.split('\n') if x and len(x.split()) == len_limit  ]
+        except : 
+            flash('輸入格式有誤，麻煩確認後重新輸入!',category='warning')
+            return redirect(url_for('home'))
+        
+        if not infos : 
+            flash('輸入格式有誤，麻煩確認後重新輸入!',category='warning')
+            return redirect(url_for('home'))
+
+        t1=threading.Thread(target=cf_main,args=(action,infos))
+        t1.start()        
+
+        flash('送出成功!',category='success')
+        audit=Audit(
+            email=current_user.email,
+            action=json.dumps({
+                    'action':f'{action} for cloudflare DNS.',
+                    'data':infos
+                })
+        )
+        audit.add_log()
+        return redirect(url_for('home'))
+    
+    return render_template('cf_dns.html',form=form)
+
+
+@app.route('/set_password',methods=['GET','POST'])
+@login_required
+def set_password():
+    form=ChangeForm()
+    if form.validate_on_submit():
+        current_user.change_password(form.password.data)
+        flash('修改密碼成功!',category='success')
+        return redirect(url_for('login'))
+    return render_template('set_password.html',form=form)
+
+
 @app.route('/register',methods=['GET','POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data,
-        username=form.username.data, password=form.password.data)
+        try : 
+            form.check_email(form.email.data)
+
+        except ValidationError : 
+
+            flash("email 已被使用過",category="success")
+            return render_template('register.html',form=form)
+        user = User(email=form.email.data,password=form.password.data)
         # add to db table
         db.session.add(user)
         db.session.commit()
@@ -453,7 +506,7 @@ def audit_log(limit=20):
     start=(page-1)*limit
     end =  page * limit if len(data) > page * limit  else len(data)
     print(start,end)
-    paginate = Pagination(page=page,per_page=20, total=len(data))
+    paginate = Pagination(page=page,per_page=10, total=len(data))
     print(paginate.links)
 
     ret = db.session.query(Audit).order_by(desc(Audit.created_at)).slice(start, end)

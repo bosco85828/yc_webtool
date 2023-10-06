@@ -1,8 +1,21 @@
 
 {% extends "base.html" %}
+<head>
+    <style>
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .table tr {
+            line-height: 2; 
+        }
+    </style>
+</head>
+
+<body>
 {% block app_content %}
 
-    <table>
+    <table class="table">
     <thead>
         <tr>
             <th>Email</th>
@@ -23,4 +36,4 @@
     {{ paginate.links }}
     
 {% endblock %}
-
+</body>
