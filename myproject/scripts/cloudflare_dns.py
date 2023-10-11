@@ -105,7 +105,7 @@ class Client():
         result=requests.put(url,headers=self.header,json=data).json()
         return result 
 
-    
+
     def del_record(self,zones,domain,value):
         zone_id=self.get_zone_id(zones,domain)
         record_id=self.get_record_id(zone_id,domain,value)
@@ -132,23 +132,28 @@ def main(action,infos):
             except ValueError : continue
             cf_client.modify_record(zones,domain,old_value,str(new_type).upper(),new_value)
 
+
     else : 
         for info in infos:
             try :
                 domain,value = info 
             except ValueError : continue
             cf_client.del_record(zones,domain,value)
+    
 
 
 if __name__=="__main__":
     cf_client=Client()
+    zones=cf_client.get_zones()
     # datas=[
-    #     ('test.1961002.app','CNAME','google.com'),
+    #     ('test.1961002.app','CNA1697004942E','google.com'),
     #     ('test.1961002.app','CNAME','google.com'),
     #     ('test.1961002.app','A','1.1.1.1')
     #     ]
     # main('add',datas)
-    print(cf_client.create_zone())
+    # print(cf_client.create_zone())
+    
+    pprint(cf_client.get_records(cf_client.get_zone_id(zones,'1961002.app')))
 
     # print(cf_client.del_record(zones,"*.1961002.app","1.1.1.1"))
     # print(cf_client.modify_record(zones,'test.1961002.app','1.1.1.1','A','2.2.2.2'))

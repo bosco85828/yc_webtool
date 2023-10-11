@@ -1,8 +1,4 @@
-test_dict={
-    'bosco':1,
-    'andy':2,
-    'anderson':3
-}
+def bill(*args):
+    print(*args)
 
-print(list(test_dict.keys()))
-print(list(test_dict.values()))
+bill('123','ssss')
