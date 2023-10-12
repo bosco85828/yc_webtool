@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+<head>
+    <style>
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .table tr {
+            line-height: 2; 
+        }
+    </style>
+</head>
+
+<body>
+{% block app_content %}
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Domain</th>
+            <th>Type</th>
+            <th>Value</th>
+            <th>TTL</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in data %}
+            <tr>
+                <td>{{ item['domain'] }}</td>
+                <td>{{ item['type'] }}</td>
+                <td>{{ item['value'] }}</td>
+                <td>{{ item['ttl'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}
+</body>
+

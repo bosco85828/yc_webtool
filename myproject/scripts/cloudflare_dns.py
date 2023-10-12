@@ -1,5 +1,6 @@
 import requests 
 from dotenv import load_dotenv
+# from myproject.models.zone import Zone
 import os 
 from pprint import pprint
 load_dotenv()
@@ -24,14 +25,18 @@ class Client():
         result=requests.get(url,headers=self.header).json()
 
     
-    def get_zones(self):
+    def get_zones(self,domain=None):
         page=1
-        url=f"https://api.cloudflare.com/client/v4/zones?per_page=50&page={page}"
+        if domain : 
+            url=f"https://api.cloudflare.com/client/v4/zones?per_page=50&page={page}&name={domain}"
+        else : 
+            url=f"https://api.cloudflare.com/client/v4/zones?per_page=50&page={page}"
         data=requests.get(url,headers=self.header).json()
         total_pages=data['result_info']['total_pages']
+        # print(total_pages)
         result=data['result']
         
-        while page <= total_pages : 
+        while page < total_pages : 
             page+=1 
             url=f"https://api.cloudflare.com/client/v4/zones?per_page=50&page={page}"
             data=requests.get(url,headers=self.header).json()
@@ -132,7 +137,6 @@ def main(action,infos):
             except ValueError : continue
             cf_client.modify_record(zones,domain,old_value,str(new_type).upper(),new_value)
 
-
     else : 
         for info in infos:
             try :
@@ -140,11 +144,28 @@ def main(action,infos):
             except ValueError : continue
             cf_client.del_record(zones,domain,value)
     
+def search_record(domain):
+    cf_client=Client()
+    zone_id = cf_client.get_zones(domain=domain)[0]['id']
+    results=[]
+    for info in cf_client.get_records(zone_id=zone_id):
+        if str(info['ttl']) == "1":
+            info['ttl'] = "自動"
+        data={
+            'domain':info['name'],
+            'type':info['type'],
+            'value':info['content'],
+            'ttl':info['ttl']
+        }
+        results.append(data)
+    return results
 
+
+    
 
 if __name__=="__main__":
-    cf_client=Client()
-    zones=cf_client.get_zones()
+    pprint(search_record('1961002.app'))
+
     # datas=[
     #     ('test.1961002.app','CNA1697004942E','google.com'),
     #     ('test.1961002.app','CNAME','google.com'),
@@ -153,7 +174,7 @@ if __name__=="__main__":
     # main('add',datas)
     # print(cf_client.create_zone())
     
-    pprint(cf_client.get_records(cf_client.get_zone_id(zones,'1961002.app')))
+    # pprint(cf_client.get_records(cf_client.get_zone_id(zones,'1961002.app')))
 
     # print(cf_client.del_record(zones,"*.1961002.app","1.1.1.1"))
     # print(cf_client.modify_record(zones,'test.1961002.app','1.1.1.1','A','2.2.2.2'))

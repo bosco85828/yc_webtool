@@ -47,3 +47,7 @@ bill.com CNAME www.google.com
 """,
 })
     submit = SubmitField('送出')
+
+class ShowCloudflareDNS(FlaskForm):
+    domain = StringField('RootDomain', validators=[DataRequired()])
+    submit = SubmitField('送出')
