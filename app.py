@@ -4,10 +4,10 @@ import os
 import time
 from flask import Flask, render_template, request , send_file , jsonify ,redirect, url_for,make_response ,flash ,abort
 from flask_login import login_user, logout_user, login_required, current_user
-from myproject import app, db
 from myproject.models.user import User
 from myproject.models.audit_log import Audit
-from myproject.form import LoginForm, RegistrationForm , ChangeForm, CloudflareDNS
+from myproject.form import LoginForm, RegistrationForm , ChangeForm, CloudflareDNS , ShowCloudflareDNS
+from myproject import app, db
 import threading
 from queue import Queue
 from myproject.scripts import yccdn_add_domain
@@ -18,6 +18,7 @@ from myproject.scripts import yc_https_set
 from datetime import datetime
 from myproject.scripts import sync_config
 from myproject.scripts.cloudflare_dns import main as cf_main
+from myproject.scripts.cloudflare_dns import search_record
 import json
 from sqlalchemy import desc
 from flask_paginate import Pagination
@@ -382,7 +383,7 @@ def login():
     form = LoginForm()
     print(form.validate_on_submit())
     if form.validate_on_submit():
-        print(123)
+
         user = User.query.filter_by(email=form.email.data).first()
         
         if user and  form.email.data == user.email and  user.check_password(form.password.data):
@@ -452,6 +453,21 @@ def cloudflare_dns():
     return render_template('cf_dns.html',form=form)
 
 
+@app.route('/cfdns_search',methods=['GET','POST'])
+@login_required
+def show_cloudflare_dns():
+    form=ShowCloudflareDNS()
+    if form.validate_on_submit():
+        domain=form.domain.data
+        try : results = search_record(domain)
+        except IndexError : 
+            flash('查無此域名，麻煩確認後重新輸入!',category='warning')
+            return render_template('show_cloudflare_dns.html',form=form)
+        return render_template('show_cloudflare_dns_completed.html',data=results)
+
+
+
+    return render_template('show_cloudflare_dns.html',form=form)
 @app.route('/set_password',methods=['GET','POST'])
 @login_required
 def set_password():
@@ -463,8 +479,7 @@ def set_password():
     return render_template('set_password.html',form=form)
 
 
-@app.route('/register',methods=['GET','POST'])
-@login_required
+@app.route('/register_bill',methods=['GET','POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
