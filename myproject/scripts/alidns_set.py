@@ -237,7 +237,7 @@ if __name__ == "__main__":
     # pprint(main('switch','sc',[('www.bosco.com',"2.2.2.2",'disable')]))
     # pprint(main('change_record','sc',[('www.bosco.com',"bosco.live",'A',"2.2.2.2")]))
     # print(delete_record('sc','818282108218929152'))
-    pprint(main('get_record','sc',[('bosco1.com',)]))
+    pprint(main('get_record','sc',[('bosco3.com',)]))
     # print(add_domain('sc',input_domain))
     # records=get_domain_record('sc','bosco.com','www')
     # print(records)

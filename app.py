@@ -498,7 +498,8 @@ def ali_dns():
         if action == "get_record" : 
             try : results=ali_main(action,c_name,infos)
             except Exception as err : 
-                print(err)
+                flash('查無域名，請確認域名是否存在。',category="warning")
+                return redirect(url_for('ali_dns'))
             return render_template('ali_dns_show.html',data=results)
         else : 
             t1=threading.Thread(target=ali_main,args=(action,c_name,infos))

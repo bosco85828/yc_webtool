@@ -53,7 +53,13 @@ class ShowCloudflareDNS(FlaskForm):
     submit = SubmitField('送出')
 
 class AliDNS(FlaskForm):
-    choices=[('add_record','Add record'),('modify','Modify record'),('get_record','Get record'),('add_domain','Create root'),('switch','Enable/Disable record'),('delete','Delete record')]
+    choices=[('add_record','Add record'),
+             ('modify','Modify record'),
+             ('get_record','Get record'),
+             ('add_domain','Create root'),
+             ('switch','Enable/Disable record'),
+             ('delete','Delete record')]
+    
     choices_2=[('sc','SC')]
     # choices=[('add','Add record'),('modify','Modify record'),('delete','Delete record')]
     action=SelectField('操作',choices=choices)
@@ -64,7 +70,7 @@ class AliDNS(FlaskForm):
 2. Modify record >> Domain Old_value DNS_type New_value
 3. Get record >> RootDomain (一次限制查詢一個)
 4. Create root >> RootDomain
-5. Enable/Disable record >> Domain Value DNS_type
+5. Enable/Disable record >> Domain Value type(disable/enable)
 6. Delete record >> Domain Value
 Example for Add record:
 bill.com CNAME www.google.com
