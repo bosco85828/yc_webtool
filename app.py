@@ -6,7 +6,7 @@ from flask import Flask, render_template, request , send_file , jsonify ,redirec
 from flask_login import login_user, logout_user, login_required, current_user
 from myproject.models.user import User
 from myproject.models.audit_log import Audit
-from myproject.form import LoginForm, RegistrationForm , ChangeForm, CloudflareDNS , ShowCloudflareDNS
+from myproject.form import LoginForm, RegistrationForm , ChangeForm, CloudflareDNS , ShowCloudflareDNS,AliDNS
 from myproject import app, db
 import threading
 from queue import Queue
@@ -17,6 +17,7 @@ from myproject.scripts import alidns_set
 from myproject.scripts import yc_https_set
 from datetime import datetime
 from myproject.scripts import sync_config
+from myproject.scripts.alidns_set import main as ali_main
 from myproject.scripts.cloudflare_dns import main as cf_main
 from myproject.scripts.cloudflare_dns import search_record
 import json
@@ -468,6 +469,55 @@ def show_cloudflare_dns():
 
 
     return render_template('show_cloudflare_dns.html',form=form)
+
+
+
+@app.route('/alidns',methods=['GET','POST'])
+@login_required
+def ali_dns():
+    form=AliDNS()
+    if form.validate_on_submit():
+        action=form.action.data
+        c_name=form.c_name.data
+        if action == 'delete' : len_limit=2
+        elif action == 'add_record' : len_limit=3       
+        elif action == "modify" : len_limit=4
+        elif action == "get_record" : len_limit=1
+        elif action == "add_domain" : len_limit=1
+        elif action == "switch" : len_limit = 3
+            
+        try : infos=[ tuple(x.split()) for x in form.infos.data.split('\n') if x and len(x.split()) == len_limit  ]
+        except : 
+            flash('輸入格式有誤，麻煩確認後重新輸入!',category='warning')
+            return redirect(url_for('home'))
+        
+        if not infos : 
+            flash('輸入格式有誤，麻煩確認後重新輸入!',category='warning')
+            return redirect(url_for('home'))
+        
+        if action == "get_record" : 
+            try : results=ali_main(action,c_name,infos)
+            except Exception as err : 
+                print(err)
+            return render_template('ali_dns_show.html',data=results)
+        else : 
+            t1=threading.Thread(target=ali_main,args=(action,c_name,infos))
+            t1.start()        
+
+            flash('送出成功!',category='success')
+            audit=Audit(
+                email=current_user.email,
+                action=json.dumps({
+                        'action':f'{action} for Aliyun DNS.',
+                        'data':infos
+                    })
+            )
+            audit.add_log()
+            return redirect(url_for('home'))
+    
+    return render_template('ali_dns.html',form=form)
+
+
 @app.route('/set_password',methods=['GET','POST'])
 @login_required
 def set_password():

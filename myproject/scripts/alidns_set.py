@@ -7,6 +7,8 @@ from aliyunsdkalidns.request.v20150109.AddDomainRequest import AddDomainRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from aliyunsdkalidns.request.v20150109.UpdateDomainRecordRequest import UpdateDomainRecordRequest
 from aliyunsdkalidns.request.v20150109.SetDomainRecordStatusRequest import SetDomainRecordStatusRequest
+from aliyunsdkalidns.request.v20150109.DeleteDomainRecordRequest import DeleteDomainRecordRequest
+
 import json
 from datetime import datetime,timezone,timedelta
 from pprint import pprint
@@ -149,10 +151,32 @@ def swich_record(c_name,record_id,type_='disable'):
     result=client.do_action_with_exception(request_)
     return json.loads(str(result,encoding='utf-8')) 
 
+def delete_record(c_name,record_id):
+    client = AcsClient(
+        customer[c_name]['id'],
+        customer[c_name]['secret'],
+        'cn-shenzhen'
+    )
+
+    request_=DeleteDomainRecordRequest()
+    request_.set_accept_format('json')
+    request_.set_RecordId(record_id)
+
+    result=client.do_action_with_exception(request_)
+    return json.loads(str(result,encoding='utf-8')) 
+
+def compare(datas,domain,old_value):
+    for data in datas:
+        if data['domain'].split('.')[0] == '@' : 
+            data['domain']='.'.join(data['domain'].split('.')[-2::])
+        if domain == data['domain'] and old_value == data['value'] :            
+            return data['record_id']
+
 def main(action,c_name,infos):
     if action == "add_domain":
         for domain in infos : 
-            add_domain(c_name,domain) 
+            domain=domain[0]
+            print(add_domain(c_name,domain))
 
     elif action == "add_record":
         for info in infos:
@@ -160,27 +184,60 @@ def main(action,c_name,infos):
             add_record(c_name,domain,type_,value)
 
     elif action == "get_record":
-        domain = infos[0]
+        domain = infos[0][0]
         print(domain)
         return get_domain_record(c_name,domain)
             
-
     elif action == "switch":
         for info in infos : 
             domain , value , type_ = info 
-            datas=get_domain_record(c_name,domain)
+            if len(domain.split('.')) > 2 : 
+                root=".".join(domain.split('.')[-2::])
+            else : 
+                root=domain
+
+            datas=get_domain_record(c_name,root)
             
-            for data in datas : 
-                if data['domain'].split('.')[0] == '@' : 
-                    data['domain']='.'.join(data['domain'].split('.')[-2::])
-                print(data['domain'])
-                if domain == data['domain'] : 
-                    print(swich_record(c_name,data['record_id'],type_))
-                    break
+            record_id=compare(datas,domain,value)            
+            print(swich_record(c_name,record_id,type_))
+            
+    
+    elif action == "modify":
+        for info in infos : 
+
+            domain , old_value , new_type , new_value = info 
+
+            if len(domain.split('.')) > 2 : 
+                root=".".join(domain.split('.')[-2::])
+                host= ".".join(domain.split('.')[0:-2])
+            else : 
+                root=domain
+                host='@'
+        
+            datas=get_domain_record(c_name,root)
+            record_id=compare(datas,domain,old_value)        
+            change_domain_record(c_name,record_id,host,new_type,new_value)
+    
+    elif action == "delete":
+        for info in infos:
+            domain,value=info
+            if len(domain.split('.')) > 2 : 
+                root=".".join(domain.split('.')[-2::])
+                host= ".".join(domain.split('.')[0:-2])
+            else : 
+                root=domain
+                host='@'
+
+            datas=get_domain_record(c_name,root)
+            record_id=compare(datas,domain,value)     
+            delete_record(c_name,record_id)
 
 
 if __name__ == "__main__":
-    pprint(main('get_record','sc',('bosco.com',)))
+    # pprint(main('switch','sc',[('www.bosco.com',"2.2.2.2",'disable')]))
+    # pprint(main('change_record','sc',[('www.bosco.com',"bosco.live",'A',"2.2.2.2")]))
+    # print(delete_record('sc','818282108218929152'))
+    pprint(main('get_record','sc',[('bosco1.com',)]))
     # print(add_domain('sc',input_domain))
     # records=get_domain_record('sc','bosco.com','www')
     # print(records)
