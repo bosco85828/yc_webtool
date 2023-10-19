@@ -18,10 +18,13 @@ import os
 load_dotenv()
 ALI_SC_ID=os.getenv('ALI_SC_ID')
 ALI_SC_SECRET=os.getenv('ALI_SC_SECRET')
+ALI_KIM_ID=os.getenv('ALI_KIM_ID')
+ALI_KIM_SECRET=os.getenv('ALI_KIM_SECRET')
 
 global customer
 customer={
-    'sc':{'id':ALI_SC_ID,'secret':ALI_SC_SECRET}
+    'sc':{'id':ALI_SC_ID,'secret':ALI_SC_SECRET},
+    'kim':{'id':ALI_KIM_ID,'secret':ALI_KIM_SECRET}
 }
 
 def add_domain(c_name,domain):

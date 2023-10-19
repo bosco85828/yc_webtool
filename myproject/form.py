@@ -60,10 +60,10 @@ class AliDNS(FlaskForm):
              ('switch','Enable/Disable record'),
              ('delete','Delete record')]
     
-    choices_2=[('sc','SC')]
+    choices_2=[('sc','sqy.familiq@gmail.com'),('kim','dns-klmicals@5506998431079570.onaliyun.com')]
     # choices=[('add','Add record'),('modify','Modify record'),('delete','Delete record')]
     action=SelectField('操作',choices=choices)
-    c_name=SelectField('customer_account',choices=choices_2)
+    c_name=SelectField('account',choices=choices_2)
     infos=TextAreaField('填入所需資訊',render_kw={"class":"custom-textarea","placeholder": """
 請按照以下格式輸入，多筆紀錄換行添加按照相同格式即可。
 1. Add record >> Domain DNS_type Value
