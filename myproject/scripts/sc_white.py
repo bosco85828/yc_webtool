@@ -95,7 +95,7 @@ def add_order(token,dlist,order,merchantId=1):
         {"typeCode":"HUNTER","typeName":"捕鱼游戏"},
         {"typeCode":"SPORTS","typeName":"体育竞技"},
         {"typeCode":"ESPORTS","typeName":"电子竞技"},
-        {"typeCode":"HOTGAME","typeName":"热门游戏","sequence":"8"}
+        {"typeCode":"HOTGAME","typeName":"热门游戏","sequence":"0"}
     ]
     final_domain=[ {'domain':x} for x in dlist ]
     for i in range(len(order)) :

@@ -99,7 +99,7 @@ def download_file(filename):
     file_path=f"{path}/myproject/scripts/domain_info/{filename}"
     return send_file(file_path, as_attachment=True)
 
-@app.route("/scwhite_completed")
+@app.route("/scwhite_completed",methods=['POST'])
 @login_required
 def scwhite_completed():
     merchant=request.values['merchant']
@@ -107,14 +107,22 @@ def scwhite_completed():
     statistics=request.values['statistics']
     domain_list=request.values['domain_list']
     data_order=request.values['data_order']
+    if not data_order : 
+        data_order="5324617"
 
-    t1=threading.Thread(target=main,args=())
+    t1=threading.Thread(target=main,args=(domain_list,data_order,statistics,merchant,domain_merchant))
+    t1.start()
+
+    flash("請求已送出，請查看 log 或者檢查目標網站是否設定成功。",category='success')
+    return redirect(url_for('scwhite'))
+
+
 
 
 @app.route("/scwite")
 @login_required
-def scwite():
-    return render_template('scwite.html',**locals())
+def scwhite():
+    return render_template('scwhite.html',**locals())
 
 
 @app.route("/DeleteCdnw")
