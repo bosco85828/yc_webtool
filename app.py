@@ -20,6 +20,7 @@ from myproject.scripts import sync_config
 from myproject.scripts.alidns_set import main as ali_main
 from myproject.scripts.cloudflare_dns import main as cf_main
 from myproject.scripts.cloudflare_dns import search_record
+from myproject.scripts.sc_white import main
 import json
 from sqlalchemy import desc
 from flask_paginate import Pagination
@@ -98,7 +99,22 @@ def download_file(filename):
     file_path=f"{path}/myproject/scripts/domain_info/{filename}"
     return send_file(file_path, as_attachment=True)
 
+@app.route("/scwhite_completed")
+@login_required
+def scwhite_completed():
+    merchant=request.values['merchant']
+    domain_merchant=request.values['domain_merchant']
+    statistics=request.values['statistics']
+    domain_list=request.values['domain_list']
+    data_order=request.values['data_order']
 
+    t1=threading.Thread(target=main,args=())
+
+
+@app.route("/scwite")
+@login_required
+def scwite():
+    return render_template('scwite.html',**locals())
 
 
 @app.route("/DeleteCdnw")
