@@ -96,19 +96,29 @@ def get_domain_record(c_name,root,host=None):
         customer[c_name]['secret'],
         'cn-shenzhen'
     )
+    page=1
+    response_list=[]
+    while True : 
+        request_=DescribeDomainRecordsRequest()
+        request_.set_accept_format('json')
+        request_.set_DomainName(root)
+        request_.set_PageSize(500)
+        request_.set_PageNumber(page)
 
-    request_=DescribeDomainRecordsRequest()
-    request_.set_accept_format('json')
-    request_.set_DomainName(root)
-    request_.set_PageSize(500)
-    if host:
-        request_.set_RRKeyWord(host)
+        if host:
+            request_.set_RRKeyWord(host)
 
-    response=client.do_action_with_exception(request_)
-    response=json.loads(str(response,encoding='utf-8'))['DomainRecords']['Record']
+        response=client.do_action_with_exception(request_)
+        data=json.loads(str(response,encoding='utf-8'))['DomainRecords']['Record']
+        
+        if data : 
+            response_list+=data
+            page+=1
+        else : 
+            break
     
     results=[]
-    for data in response : 
+    for data in response_list : 
         results.append({
             'domain':str(data['RR']) + '.' + str(data['DomainName']),
             'type':data['Type'],
@@ -237,10 +247,10 @@ def main(action,c_name,infos):
 
 
 if __name__ == "__main__":
-    # pprint(main('switch','sc',[('www.bosco.com',"2.2.2.2",'disable')]))
+    pprint(main('switch','kim',[('1960000.app.klchemicals.net',"cdn-node-hk-common-8.klchemicals.net",'enable')]))
     # pprint(main('change_record','sc',[('www.bosco.com',"bosco.live",'A',"2.2.2.2")]))
     # print(delete_record('sc','818282108218929152'))
-    pprint(main('get_record','sc',[('bosco3.com',)]))
+    # pprint(len(main('get_record','kim',[('klchemicals.net',)])))
     # print(add_domain('sc',input_domain))
     # records=get_domain_record('sc','bosco.com','www')
     # print(records)

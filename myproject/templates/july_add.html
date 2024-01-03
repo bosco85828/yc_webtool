@@ -1,0 +1,15 @@
+<head>
+    <style>
+        #infos {
+            height: 200px;
+        }
+    </style>
+</head>
+
+{% extends "base.html" %}
+{% block app_content %}
+    {% import 'bootstrap/wtf.html' as wtf %}
+    {{ wtf.quick_form(form) }}
+
+{% endblock %}
+
