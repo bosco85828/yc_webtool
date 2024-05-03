@@ -20,6 +20,7 @@ from myproject.scripts import sync_config
 from myproject.scripts.alidns_set import main as ali_main
 from myproject.scripts.cloudflare_dns import main as cf_main
 from myproject.scripts.cloudflare_dns import search_record
+from myproject.scripts.tclive import main
 import json
 from sqlalchemy import desc
 from flask_paginate import Pagination
@@ -578,6 +579,24 @@ def audit_log(limit=15):
 
     ret = db.session.query(Audit).order_by(desc(Audit.created_at)).slice(start, end)
     return render_template('audit_log.html', data=ret, paginate=paginate)
+
+@app.route('/tclive',methods=['GET'])
+@login_required
+def tclive_list():
+    domains=main('get')
+    return render_template('tclive.html', domains=domains)
+
+
+@app.route('/tclive',methods=['POST'])
+@login_required
+def tclive_post():
+    domain=request.values['domain']
+    _type=request.values['type']
+    
+    result=main(_type,domain)
+    return redirect('/tclive')
+    # return render_template('tclive.html', domains=domains)
+
 
 
 if __name__ == '__main__':

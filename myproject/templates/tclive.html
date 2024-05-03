@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block app_content %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th>CNAME</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for domain in domains %}
+            <tr>
+                <td>{{ domain['domain'] }}</td>
+                <td>{{ domain['cname'] }}</td>
+                <!-- <td>{{ domain['type'] }}</td> -->
+
+                {% if domain['type'] == 1 %}
+                <td>播放域名</td>
+                {% else %}
+                <td>推流域名</td>
+                {% endif %}
+
+                <!-- <td>{{ domain['status'] }}</td> -->
+                {% if domain['status'] == 1 %}
+                <td>啟用</td>
+                {% else %}
+                <td>禁用</td>
+                {% endif %}
+                <td>
+                    {% if domain['status'] == 1 %}
+                    <form action="/tclive?" method="post">
+                        <input type="hidden" name="domain" value="{{ domain['domain'] }}">
+                        <input type="hidden" name="type" value="disable">
+                        <button type="submit"   >Disable</button>
+                        
+                    </form>
+                    {% else %}
+                    <form action="/tclive?" method="post">
+                        <input type="hidden" name="domain" value="{{ domain['domain'] }}">
+                        <input type="hidden" name="type" value="enable">
+                        <button type="submit"  >Enable</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}    

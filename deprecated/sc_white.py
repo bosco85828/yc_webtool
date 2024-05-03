@@ -231,8 +231,13 @@ def main(input_dcodelist,input_order,statistics,merchant,domain_merchant):
 
 
 if __name__ == "__main__":
-    print(SC_WHITE_NAME)
-    print(SC_WHITE_PASSWORD)
+    # print(SC_WHITE_NAME)
+    # print(SC_WHITE_PASSWORD)
+    for i in range(1,7):
+        domain="196999{}.com".format(i)
+        print(domain)
+    
+    # print(add_statistics())
     # token=get_token()
 
     # input_="""bill225.com 11111 s9.cnzz.com:1281219776
