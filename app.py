@@ -20,11 +20,8 @@ from myproject.scripts import sync_config
 from myproject.scripts.alidns_set import main as ali_main
 from myproject.scripts.cloudflare_dns import main as cf_main
 from myproject.scripts.cloudflare_dns import search_record
-<<<<<<< HEAD
 from myproject.scripts.tclive import main
-=======
 from myproject.scripts.sc_white import main
->>>>>>> add_july
 import json
 from sqlalchemy import desc
 from flask_paginate import Pagination
@@ -360,6 +357,19 @@ def checkyctask():
         task=['We currently do not have any log.']
     
     return render_template('check_yc_task.html',**locals())
+
+
+@app.route("/checkscwhite")
+@login_required
+def checksctask():
+    try:
+        with open("scwhite.log") as f : 
+            task=f.readlines()
+        print(task)
+    except FileNotFoundError : 
+        task=['We currently do not have any log.']
+    
+    return render_template('checkscwhite.html',**locals())
 
 @app.route("/checkalidnsdomaintask")
 @login_required

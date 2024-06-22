@@ -23,7 +23,7 @@ def get_token():
         'signName':SC_WHITE_NAME,
         'signPassword':SC_WHITE_PASSWORD
     }
-
+    
     result=requests.post(url,headers=header,json=data).json()
     
     return result['data']['token']
@@ -33,8 +33,10 @@ def get_token():
 def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None):
     domain_list = list(set(dlist) - all_domain)
     domain_str=",".join(domain_list)
+    
     # print(domain_str)
     url="https://api.speedfan66.com/api/admin/SysMerchantDomainInfo/Create"
+    
     header={
         'authority':'api.speedfan66.com',
         'accept':'application/json, text/plain, */*',
@@ -44,7 +46,7 @@ def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None)
         'referer': 'http://admin.howfunwedo.com/',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'        
     }
-
+    
     data={
         'merchantId':merchantId,
         'type':type_,
@@ -56,8 +58,13 @@ def add_white(token,dlist,merchantId=1,type_=0,platformNameId=2,all_domain=None)
         'platformNameId':platformNameId
     }
 
-    result=requests.post(url,headers=header,json=data).json()
-
+    if ":" in domain_list[0] and domain_list[0].split(':')[1] != "80":        
+        data['isHttps'] = True     
+    
+    result = requests.post(url,headers=header,json=data).json()
+    print("=========")
+    print(result)
+    print("=========")
     return result
 
 # merchantID 1="196TY" 2="KK體育" 3="T體育"
@@ -192,9 +199,16 @@ def main(input_dcodelist,input_order,statistics,merchant,domain_merchant):
         # domain_str=",".join(domainlist)
         try:statistics_list=[(x[0],x[2]) for x in dcodelist if x]
         except: statistics_list = None 
+
+        enable_https_dlist=[ domain for domain in domainlist if (":" in domain and domain.split(':')[1] != "80")]
+        disable_https_dlist= list(set(domainlist) - set(enable_https_dlist))
+
         result=[]
-        result.append(str({"add_white":add_white(token,domainlist,merchantId=domain_merchant,all_domain=check_white(token))}))
-        
+        if enable_https_dlist : 
+            result.append(str({"add_white":add_white(token,enable_https_dlist,merchantId=domain_merchant,all_domain=check_white(token))}))
+        if disable_https_dlist : 
+            result.append(str({"add_white":add_white(token,disable_https_dlist,merchantId=domain_merchant,all_domain=check_white(token))}))
+
         if str(domain_merchant) != "3" :
             result.append(str({"add_order":add_order(token,domainlist,input_order,domain_merchant)}))
 
