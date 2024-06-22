@@ -195,7 +195,7 @@ def get_domains(cusid,file_name):
     print(len(domain_list))
     browser.quit()
 
-    with open(f"{path}/yccdn/domain_info/{file_name}.csv","w+") as f : 
+    with open(f"{path}/myproject/scripts/domain_info/{file_name}.csv","w+") as f : 
         writer=csv.writer(f)
         writer.writerow(list(domain_dict.keys()))
         for domain_dict in domain_list : 
@@ -211,6 +211,6 @@ def get_domains(cusid,file_name):
 if __name__ == "__main__":
     cusid='kk'
 
-    get_domains(cusid,'yctest917')
+    get_domains(cusid,'yctest1120')
 
         
